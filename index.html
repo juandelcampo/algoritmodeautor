@@ -125,10 +125,8 @@
            MEDIA QUERIES - OPTIMIZACIÓN MÓVIL 
            ========================================= */
         @media (max-width: 900px) {
-            header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 15px 4% 10px 4%; }
-            .main-nav { flex-direction: row; width: 100%; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
-            .main-nav::-webkit-scrollbar { display: none; }
-            html { scroll-padding-top: 140px; }
+            header { display: none; } /* Oculta el header completamente en móviles */
+            html { scroll-padding-top: 0; } /* Resetea el padding ya que no hay header estático */
             .scroll-btn { display: none !important; }
             .row-posters { padding-bottom: 10px; }
             .hero-wrapper { height: 70vh; min-height: 450px; }
@@ -136,9 +134,8 @@
             .hero-content { max-width: 100%; }
             .hero-title { font-size: 2.2rem; margin-bottom: 15px; }
             .play-btn { padding: 10px 25px; font-size: 0.9rem; }
-            .logo { font-size: 1.8rem; }
             .row-title { font-size: 3rem; }
-            .main-content { margin-top: 10px; }
+            .main-content { margin-top: 0; } /* Remueve el margen superior innecesario */
             
             .modal-content { flex-direction: column; padding: 25px 20px; gap: 20px; overflow-y: auto;}
             .modal-poster { width: 50%; margin: 0 auto; aspect-ratio: auto;}
@@ -222,7 +219,7 @@
             { playlistId: "PLV7ZM4nm6CtJhkRgy6oI_09l7J3zuhD0s", title: "Experimental", type: "genre" },
             
             { playlistId: "PLV7ZM4nm6CtJMglVvjnQcfR48f9jY8ioL", title: "Mariano Llinás", type: "director"},
-            { playlistId: "PLV7ZM4nm6CtLIIr_krlvjrL6cXt4JPViO", title: "Paúl Perrone", type: "director"},
+            { playlistId: "PLV7ZM4nm6CtLIIr_krlvjrL6cXt4JPViO", title: "Raúl Perrone", type: "director"},
             { playlistId: "PLV7ZM4nm6CtLuDAhLYWt9SIBj968Erm1l", title: "Leonardo Favio", type: "director"},
             { playlistId: "PLV7ZM4nm6CtKG54-9aJYbW-N5G76oglSE", title: "Andrei Tarkovsky", type: "director"},
             { playlistId: "PLV7ZM4nm6CtIANqEvGy04Y6ueTlo3PXk1", title: "Werner Herzog", type: "director"},
