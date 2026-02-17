@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmo de Autor</title>
+    <link rel="icon" type="image/png" href="icons8-youtube-32.png">
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+        :root { --bg-color: #0f0f0f; --text-color: #e5e5e5; --netflix-red: #E50914; }
+        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-x: hidden; }
+
+        /* --- HEADER Y NAVEGACIÓN --- */
+        header { padding: 15px 4%; position: fixed; top: 0; width: 100%; background: linear-gradient(to bottom, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0) 100%); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; box-sizing: border-box; display: flex; align-items: center; gap: 30px; }
+        .logo { color: var(--netflix-red); font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-decoration: none; flex-shrink: 0; }
+        .main-nav { display: flex; align-items: center; gap: 15px; width: 100%; overflow: visible; }
+
+        /* --- DROPDOWNS --- */
+        .dropdown { position: relative; display: inline-block; flex-shrink: 0; }
+        .dropbtn { background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 10px 18px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .dropdown:hover .dropbtn { background: rgba(255, 255, 255, 0.15); }
+        .dropdown-content { display: none; position: absolute; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); min-width: 220px; box-shadow: 0px 15px 30px rgba(0,0,0,0.7); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); top: 110%; left: 0; padding: 10px 0; z-index: 1001; }
+        .dropdown:hover .dropdown-content { display: block; animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .dropdown-content a { color: rgba(255, 255, 255, 0.7); padding: 10px 20px; text-decoration: none; display: block; font-size: 0.9rem; transition: all 0.2s; }
+        .dropdown-content a:hover { background-color: rgba(255, 255, 255, 0.1); color: #fff; padding-left: 25px; }
+
+        /* --- CHIPS DE GÉNEROS --- */
+        .genres-menu { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding: 5px 0; }
+        .genres-menu::-webkit-scrollbar { display: none; }
+        .genre-chip { color: rgba(255, 255, 255, 0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 18px; border-radius: 20px; background: rgba(255, 255, 255, 0.1); white-space: nowrap; border: 1px solid transparent; transition: all 0.3s ease; }
+        .genre-chip:hover { background: #fff; color: #000; border-color: #fff; transform: scale(1.05); }
+
+        /* --- SECCIÓN HERO FULL BLEED --- */
+        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; }
+        .hero-carousel { display: flex; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+        .hero-carousel::-webkit-scrollbar { display: none; }
+        .hero-slide { flex: 0 0 100%; height: 100%; position: relative; background-size: cover; background-position: center top; scroll-snap-align: start; display: flex; align-items: flex-end; padding-bottom: 8%; }
+        .hero-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0.4) 40%, transparent 80%), linear-gradient(to top, rgba(15,15,15,1) 0%, rgba(15,15,15,0.6) 20%, transparent 60%); z-index: 1; }
+        .hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%; max-width: 800px; padding: 0 4%; }
+        .hero-title { font-size: 3.5rem; font-weight: 900; margin: 0 0 25px 0; line-height: 1.1; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0,0,0,0.8); color: #fff; }
+        .play-btn { display: inline-flex; align-items: center; gap: 12px; background: #fff; color: #000; padding: 14px 35px; font-size: 1.1rem; font-weight: 700; border-radius: 4px; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s ease; border: none; cursor: pointer; }
+        .play-btn:hover { background: rgba(255, 255, 255, 0.8); transform: scale(1.05); }
+        .hero-btn { font-size: 4rem; width: 70px; }
+
+        /* --- CONTENEDOR DE LISTAS --- */
+        .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; }
+        .row { margin-bottom: 40px; position: relative; }
+        .row-title { font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); display: flex; align-items: center; }
+        .row-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background-color: var(--netflix-red); margin-right: 12px; border-radius: 2px; }
+        .row-posters { display: flex; overflow-y: visible; overflow-x: auto; padding: 20px 4%; gap: 15px; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+        .row-posters::-webkit-scrollbar { display: none; }
+        .scroll-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 100%; background: rgba(15,15,15,0.6); border: none; color: #fff; font-size: 3rem; cursor: pointer; z-index: 200; opacity: 0; transition: opacity 0.3s ease, background 0.3s ease; }
+        .row:hover .scroll-btn, .hero-wrapper:hover .scroll-btn { opacity: 0.8; }
+        .scroll-btn:hover { background: rgba(15,15,15,0.9); opacity: 1 !important; }
+        .scroll-btn.left { left: 0; border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .scroll-btn.right { right: 0; border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+
+        .movie-card-wrapper { flex: 0 0 auto; width: 280px; text-decoration: none; cursor: pointer; transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), z-index 0s linear 0.1s; position: relative; z-index: 1; scroll-snap-align: start; }
+        .movie-card-wrapper:hover { transform: scale(1.15); z-index: 100; transition-delay: 0s; }
+        .poster-container { width: 100%; aspect-ratio: 16/9; position: relative; border-radius: 8px; overflow: hidden; background-color: #222; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: box-shadow 0.3s ease; }
+        .movie-card-wrapper:hover .poster-container { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8); }
+        .thumbnail { width: 100%; height: 100%; object-fit: cover; }
+        .movie-info { padding: 12px 4px 0 4px; color: #ffffff; text-align: center; font-size: 1.5rem; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; opacity: 0.8; transition: opacity 0.3s ease; }
+        .movie-card-wrapper:hover .movie-info { opacity: 1; color: var(--netflix-red); }
+        .duration-overlay { position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: #fff; padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; font-weight: 600; pointer-events: none; }
+
+        /* --- MODAL DE DETALLES DE PELÍCULA --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: #141414;
+            width: 90%; max-width: 900px; max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            position: relative;
+            display: flex; flex-direction: row; gap: 30px;
+            padding: 40px; box-sizing: border-box;
+            transform: translateY(50px);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .modal-close {
+            position: absolute; top: 20px; right: 25px;
+            background: rgba(255,255,255,0.1); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%;
+            font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+        .modal-poster { width: 35%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); object-fit: cover; aspect-ratio: 2/3; }
+        
+        .modal-info { width: 65%; display: flex; flex-direction: column; }
+        .modal-title { font-size: 2.5rem; margin: 0 0 10px 0; line-height: 1.1; }
+        
+        .modal-meta { display: flex; gap: 15px; color: #a3a3a3; font-size: 0.9rem; margin-bottom: 20px; align-items: center; flex-wrap: wrap;}
+        .imdb-badge { background: #f5c518; color: black; font-weight: 900; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;}
+        
+        .modal-plot { font-size: 1.1rem; line-height: 1.6; color: #d2d2d2; margin-bottom: 25px; }
+        .modal-cast { color: #888; font-size: 0.95rem; margin-bottom: 8px; line-height: 1.4; }
+        .modal-cast span { color: #fff; }
+
+        .modal-play-btn { margin-top: auto; display: inline-flex; justify-content: center; margin-top: 30px;}
+
+        /* Loading local para el modal */
+        .modal-loading { position: absolute; inset: 0; background: #141414; display: flex; justify-content: center; align-items: center; z-index: 10; border-radius: 12px; }
+        .loading-global { display: flex; justify-content: center; align-items: center; height: 60vh; font-size: 1.5rem; color: #888; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--netflix-red); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-right: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* =========================================
+           MEDIA QUERIES - OPTIMIZACIÓN MÓVIL 
+           ========================================= */
+        @media (max-width: 900px) {
+            header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 15px 4% 10px 4%; }
+            .main-nav { flex-direction: row; width: 100%; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+            .main-nav::-webkit-scrollbar { display: none; }
+            html { scroll-padding-top: 140px; }
+            .scroll-btn { display: none !important; }
+            .row-posters { padding-bottom: 10px; }
+            .hero-wrapper { height: 70vh; min-height: 450px; }
+            .hero-slide { align-items: flex-end; padding-bottom: 15%; }
+            .hero-content { max-width: 100%; }
+            .hero-title { font-size: 2.2rem; margin-bottom: 15px; }
+            .play-btn { padding: 10px 25px; font-size: 0.9rem; }
+            .logo { font-size: 1.8rem; }
+            .row-title { font-size: 3rem; }
+            .main-content { margin-top: 10px; }
+            
+            .modal-content { flex-direction: column; padding: 25px 20px; gap: 20px; overflow-y: auto;}
+            .modal-poster { width: 50%; margin: 0 auto; aspect-ratio: auto;}
+            .modal-info { width: 100%; }
+            .modal-title { font-size: 1.8rem; }
+            .modal-close { top: 10px; right: 10px; background: rgba(0,0,0,0.5); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">Pelis</a>
+        <nav id="main-nav" class="main-nav">
+            <div id="genres-menu" class="genres-menu"></div>
+            <div class="dropdown">
+                <button class="dropbtn">Directores <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg></button>
+                <div class="dropdown-content" id="directors-menu"></div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Series <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg></button>
+                <div class="dropdown-content" id="series-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="hero-wrapper" id="hero-wrapper" style="display: none;">
+        <button class="scroll-btn left hero-btn" onclick="scrollHero('left')">‹</button>
+        <div id="hero-carousel" class="hero-carousel"></div>
+        <button class="scroll-btn right hero-btn" onclick="scrollHero('right')">›</button>
+    </div>
+
+    <div class="main-content" id="app">
+        <div class="loading-global"><div class="spinner"></div> Cargando cartelera...</div>
+    </div>
+
+    <div id="movie-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div id="modal-loader" class="modal-loading"><div class="spinner"></div></div>
+            
+            <img id="modal-poster" class="modal-poster" src="" alt="Poster">
+            
+            <div class="modal-info">
+                <h2 id="modal-title" class="modal-title">Título de la película</h2>
+                <div class="modal-meta">
+                    <span id="modal-year">2023</span>
+                    <span id="modal-runtime">120 min</span>
+                    <span class="imdb-badge">IMDb <span id="modal-rating">N/A</span></span>
+                </div>
+                <p id="modal-plot" class="modal-plot">Cargando sinopsis...</p>
+                <div class="modal-cast">Director: <span id="modal-director">-</span></div>
+                <div class="modal-cast">Elenco: <span id="modal-actors">-</span></div>
+                
+                <a id="modal-play" class="play-btn modal-play-btn" href="#" target="_blank">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    Reproducir en YouTube
+                </a>
+            </div>
+        </div>
+    </div>
+
+   <script>
+        const API_KEY = 'AIzaSyDuK3KF3GCPU_IHzHUOVpWHNqqBN-7lVPM'; 
+        const OMDB_API_KEY = 'dd75c1c5'; 
+        const MAX_VIDEOS_PER_ROW = 100; 
+        const HERO_PLAYLIST_ID = "PLV7ZM4nm6CtLwkaoAb6_4SxpW9Xn6cRcM"; 
+
+        const categories = [
+
+            { playlistId: "PLV7ZM4nm6CtLez0TwVAwv-0ZTF9vZt6sM", title: "Drama", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtJNiGHg3OziNp7QnB7J6QOm", title: "Comedia", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtJki16toQetCi51p-CJ04Rt", title: "Acción", type: "genre" },              
+            { playlistId: "PLV7ZM4nm6CtLywqlDY4bM94kFPIJr4ALz", title: "Bélico", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtKndLGdyUOwCni78HiwFIsP", title: "Ciencia Ficción", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtJdz2iKDuiRhElws8Gy-MLf", title: "Misterio", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtJZgWKrm3b-N5IlF6OeP7hL", title: "Western", type: "genre" },          
+            { playlistId: "PLV7ZM4nm6CtJMZcL-Nrmoqoobe6pztsv9", title: "Terror", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtI4dJNi59gYpi5p1aSeBwQ0", title: "Animación", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtLTxKcOziHo-kueG1EDlLZ6", title: "Documental", type: "genre" },
+            { playlistId: "PLV7ZM4nm6CtJhkRgy6oI_09l7J3zuhD0s", title: "Experimental", type: "genre" },
+            
+            { playlistId: "PLV7ZM4nm6CtJMglVvjnQcfR48f9jY8ioL", title: "Mariano Llinás", type: "director"},
+            { playlistId: "PLV7ZM4nm6CtLIIr_krlvjrL6cXt4JPViO", title: "Paúl Perrone", type: "director"},
+            { playlistId: "PLV7ZM4nm6CtLuDAhLYWt9SIBj968Erm1l", title: "Leonardo Favio", type: "director"},
+            { playlistId: "PLV7ZM4nm6CtKG54-9aJYbW-N5G76oglSE", title: "Andrei Tarkovsky", type: "director"},
+            { playlistId: "PLV7ZM4nm6CtIANqEvGy04Y6ueTlo3PXk1", title: "Werner Herzog", type: "director"},
+            { playlistId: "PLV7ZM4nm6CtIwn8O37pT6RVnSfqocLoD1", title: "Ingmar Bergman", type: "director"},
+            
+            { playlistId: "PLznVtT7kqmTJU9_PHmIUQQsVLE9arBc8b", title: "Obra Maestra: Dekalog", type: "series"},
+            { playlistId: "PLVAh-MgDVqvDUEq6qDXqORBioE4Yhol_z", title: "Fenómeno: The Backrooms", type: "series"}
+        ];
+
+        const appContainer = document.getElementById('app');
+        const directorsMenu = document.getElementById('directors-menu');
+        const seriesMenu = document.getElementById('series-menu');
+        const genresMenu = document.getElementById('genres-menu');
+
+        function generateSlug(text) {
+            return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+        }
+
+        // --- SUPER LIMPIADOR DE TÍTULOS ---
+        function cleanTitle(title) {
+            let t = title;
+            t = t.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
+            if (t.includes(' - ')) t = t.split(' - ')[0];
+            if (t.includes(' | ')) t = t.split(' | ')[0];
+            if (t.includes(' / ')) t = t.split(' / ')[0];
+            if (t.includes(' // ')) t = t.split(' // ')[0];
+            if (t.includes(' • ')) t = t.split(' • ')[0];
+            if (t.includes(' ‧ ')) t = t.split(' ‧ ')[0];
+            if (t.includes('1')) t = t.split('1')[0];
+            if (t.includes('2')) t = t.split('2')[0];
+            if (t.includes('/')) t = t.split('/')[0];
+
+            const basura = [ 'pelicula completa', 'película completa', 'subtitulada', 'Watch: comedy, drama','subtitle', '-','480p', 'eng', 'dub','"', '~', 'cine', 'argentino', 'full', 'movie','subtitulado', 'español', 'espanol', 'latino', 'audio', 'hd', '4k', '1080p', '720p', 'oficial', 'trailer', 'cortometraje', 'documental' ];
+            basura.forEach(palabra => { t = t.replace(new RegExp(palabra, 'gi'), ''); });
+            return t.trim().replace(/^[-|]+|[-|]+$/g, '').trim();
+        }
+
+        // --- NUEVO: FUNCIÓN MAGICA DE TRADUCCIÓN A ESPAÑOL ---
+        // Usa la API gratuita (y secreta) de Google Translate
+        async function translateToSpanish(text) {
+            if (!text || text === "N/A") return text;
+            try {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(text)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                // Google devuelve la traducción dividida en fragmentos, la unimos:
+                return data[0].map(item => item[0]).join('');
+            } catch (error) {
+                console.error("Error traduciendo al español:", error);
+                return text; // Si falla por alguna razón, deja el texto original en inglés
+            }
+        }
+
+        async function initApp() {
+            if (!API_KEY || API_KEY === 'AAIzaSyDuK3KF3GCPU_IHzHUOVpWHNqqBN-7lVPM') {
+                appContainer.innerHTML = '<h2 style="text-align:center; margin-top:50px; color: #E50914;">⚠️ Falta configurar la API Key.</h2>';
+                return;
+            }
+
+            try {
+                await loadHeroCarousel();
+                appContainer.innerHTML = ''; 
+
+                const rowElements = categories.map(category => {
+                    const sectionId = generateSlug(category.title);
+                    const shortTitle = category.title.includes(':') ? category.title.split(':')[1].trim() : category.title;
+
+                    const navLink = document.createElement('a');
+                    navLink.href = `#${sectionId}`;
+                    navLink.innerText = shortTitle;
+
+                    if (category.type === "director") { directorsMenu.appendChild(navLink); } 
+                    else if (category.type === "series") { seriesMenu.appendChild(navLink); } 
+                    else { navLink.className = 'genre-chip'; genresMenu.appendChild(navLink); }
+
+                    return createEmptyRowStructure(category.title, sectionId);
+                });
+
+                const fetchPromises = categories.map((category, index) => {
+                    return loadRowData(category.playlistId, rowElements[index]);
+                });
+
+                await Promise.all(fetchPromises);
+
+            } catch (error) {
+                console.error("Error inicializando la app:", error);
+            }
+        }
+
+        async function loadHeroCarousel() {
+            const videos = await fetchPlaylistVideos(HERO_PLAYLIST_ID);
+            const carousel = document.getElementById('hero-carousel');
+            const wrapper = document.getElementById('hero-wrapper');
+
+            if (!videos || videos.length === 0) return;
+            const fragment = document.createDocumentFragment();
+
+            videos.forEach(video => {
+                const snippet = video.snippet;
+                const originalTitle = snippet.title;
+                const uiTitle = cleanTitle(originalTitle); 
+                
+                const videoId = snippet.resourceId.videoId;
+                const imgUrl = snippet.thumbnails?.maxres?.url || snippet.thumbnails?.standard?.url || snippet.thumbnails?.high?.url || '';
+
+                const slide = document.createElement('div');
+                slide.className = 'hero-slide';
+                slide.style.backgroundImage = `url('${imgUrl}')`;
+
+                const content = document.createElement('div');
+                content.className = 'hero-content';
+
+                const titleEl = document.createElement('h1');
+                titleEl.className = 'hero-title';
+                titleEl.innerText = uiTitle; 
+
+                const btn = document.createElement('button');
+                btn.className = 'play-btn';
+                btn.onclick = () => openMovieModal(videoId, uiTitle, imgUrl, video._duration, snippet.description);
+                btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></svg> Más Info`;
+
+                content.appendChild(titleEl);
+                content.appendChild(btn);
+                slide.appendChild(content);
+                fragment.appendChild(slide);
+            });
+
+            carousel.appendChild(fragment);
+            wrapper.style.display = 'block';
+        }
+
+        function scrollHero(direction) {
+            const carousel = document.getElementById('hero-carousel');
+            const scrollAmount = window.innerWidth;
+            if (direction === 'left') { carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' }); } 
+            else { carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' }); }
+        }
+
+        function createEmptyRowStructure(titleText, id) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+            rowDiv.id = id; 
+
+            const title = document.createElement('h2');
+            title.className = 'row-title';
+            title.innerText = titleText;
+
+            const postersDiv = document.createElement('div');
+            postersDiv.className = 'row-posters';
+
+            const leftBtn = document.createElement('button');
+            leftBtn.className = 'scroll-btn left';
+            leftBtn.innerHTML = '‹';
+            leftBtn.onclick = () => postersDiv.scrollBy({ left: -window.innerWidth * 0.8, behavior: 'smooth' });
+
+            const rightBtn = document.createElement('button');
+            rightBtn.className = 'scroll-btn right';
+            rightBtn.innerHTML = '›';
+            rightBtn.onclick = () => postersDiv.scrollBy({ left: window.innerWidth * 0.8, behavior: 'smooth' });
+
+            rowDiv.appendChild(title);
+            rowDiv.appendChild(leftBtn);
+            rowDiv.appendChild(postersDiv);
+            rowDiv.appendChild(rightBtn);
+            appContainer.appendChild(rowDiv);
+
+            return { rowDiv, postersDiv, leftBtn, rightBtn };
+        }
+
+        async function loadRowData(playlistId, elements) {
+            const { rowDiv, postersDiv, leftBtn, rightBtn } = elements;
+            const videos = await fetchPlaylistVideos(playlistId);
+
+            if (videos.length === 0) { rowDiv.style.display = 'none'; return null; }
+            if (videos.length < 5) { leftBtn.style.display = 'none'; rightBtn.style.display = 'none'; }
+
+            const fragment = document.createDocumentFragment();
+            videos.forEach(video => fragment.appendChild(createMovieCard(video)));
+            postersDiv.appendChild(fragment);
+        }
+
+        async function fetchPlaylistVideos(playlistId) {
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=${MAX_VIDEOS_PER_ROW}&playlistId=${playlistId}&key=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (!data.items || data.items.length === 0) return [];
+
+                const videoIds = data.items.map(it => it.snippet?.resourceId?.videoId).filter(Boolean);
+                const videosUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds.join(',')}&key=${API_KEY}`;
+                const resp2 = await fetch(videosUrl);
+                const data2 = await resp2.json();
+                
+                const durations = {};
+                if (data2.items) {
+                    data2.items.forEach(v => { durations[v.id] = v.contentDetails?.duration || ''; });
+                }
+
+                data.items.forEach(it => {
+                    const vid = it.snippet?.resourceId?.videoId;
+                    it._duration = (vid && durations[vid]) ? formatISO8601Duration(durations[vid]) : '';
+                });
+
+                return data.items;
+            } catch (error) {
+                console.error(`Error en playlist ${playlistId}:`, error);
+                return [];
+            }
+        }
+
+        // --- DOBLE BÚSQUEDA EN OMDb CON TRADUCCIÓN ---
+        async function openMovieModal(videoId, cleanUiTitle, ytPosterUrl, duration, ytDescription) {
+            const modal = document.getElementById('movie-modal');
+            const loader = document.getElementById('modal-loader');
+            
+            document.getElementById('modal-title').innerText = cleanUiTitle; 
+            document.getElementById('modal-poster').src = ytPosterUrl;
+            document.getElementById('modal-play').href = `https://www.youtube.com/watch?v=${videoId}`;
+            document.getElementById('modal-plot').innerText = ytDescription || "Sin descripción en YouTube.";
+            document.getElementById('modal-year').innerText = "YouTube";
+            document.getElementById('modal-runtime').innerText = duration || "- min";
+            document.getElementById('modal-rating').innerText = "N/A";
+            document.getElementById('modal-director').innerText = "Desconocido";
+            document.getElementById('modal-actors').innerText = "Desconocido";
+
+            modal.classList.add('active');
+            loader.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            try {
+                let response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                let data = await response.json();
+
+                if (data.Response === "False") {
+                    const searchResp = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                    const searchData = await searchResp.json();
+                    
+                    if (searchData.Response === "True" && searchData.Search.length > 0) {
+                        const imdbId = searchData.Search[0].imdbID;
+                        response = await fetch(`https://www.omdbapi.com/?i=${imdbId}&apikey=${OMDB_API_KEY}`);
+                        data = await response.json();
+                    }
+                }
+
+                if (data.Response === "True") {
+                    if(data.Title) document.getElementById('modal-title').innerText = data.Title;
+                    if(data.Poster !== "N/A") document.getElementById('modal-poster').src = data.Poster;
+                    
+                    // --- AQUÍ APLICAMOS LA MAGIA DE LA TRADUCCIÓN ---
+                    let finalPlot = ytDescription || "Sin descripción.";
+                    if (data.Plot && data.Plot !== "N/A") {
+                        finalPlot = await translateToSpanish(data.Plot);
+                    }
+                    document.getElementById('modal-plot').innerText = finalPlot;
+                    
+                    document.getElementById('modal-year').innerText = data.Year;
+                    document.getElementById('modal-runtime').innerText = data.Runtime;
+                    document.getElementById('modal-rating').innerText = data.imdbRating;
+                    document.getElementById('modal-director').innerText = data.Director;
+                    document.getElementById('modal-actors').innerText = data.Actors;
+                }
+            } catch (error) {
+                console.error("Error conectando con OMDb:", error);
+            }
+            
+            loader.style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('movie-modal').classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+        }
+
+        document.getElementById('movie-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function createMovieCard(videoItem) {
+            const snippet = videoItem.snippet;
+            const videoId = snippet.resourceId.videoId;
+            const originalTitle = snippet.title;
+            const uiTitle = cleanTitle(originalTitle); 
+            
+            const thumbnails = snippet.thumbnails;
+            const imgUrl = thumbnails?.maxres?.url || thumbnails?.standard?.url || thumbnails?.high?.url || thumbnails?.medium?.url || 'https://via.placeholder.com/280x157/222/555?text=CineTube';
+
+            const cardWrapper = document.createElement('div'); 
+            cardWrapper.className = 'movie-card-wrapper'; 
+            
+            cardWrapper.onclick = () => openMovieModal(videoId, uiTitle, imgUrl, videoItem._duration, snippet.description);
+
+            const posterContainer = document.createElement('div');
+            posterContainer.className = 'poster-container';
+
+            const img = document.createElement('img');
+            img.className = 'thumbnail';
+            img.src = imgUrl;
+            img.alt = uiTitle;
+            img.loading = "lazy"; 
+
+            posterContainer.appendChild(img);
+
+            if (videoItem._duration) {
+                const durationOverlay = document.createElement('div');
+                durationOverlay.className = 'duration-overlay';
+                durationOverlay.innerText = videoItem._duration;
+                posterContainer.appendChild(durationOverlay);
+            }
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'movie-info';
+            infoDiv.innerText = uiTitle; 
+            infoDiv.title = uiTitle; 
+
+            cardWrapper.appendChild(posterContainer);
+            cardWrapper.appendChild(infoDiv);
+
+            return cardWrapper;
+        }
+
+        function formatISO8601Duration(iso) {
+            if (!iso) return '';
+            const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            if (!m) return '';
+            const h = parseInt(m[1] || 0, 10);
+            const mm = parseInt(m[2] || 0, 10);
+            const ss = parseInt(m[3] || 0, 10);
+            const pad = (n) => n.toString().padStart(2, '0');
+            if (h > 0) return `${h}:${pad(mm)}:${pad(ss)}`;
+            return `${mm}:${pad(ss)}`;
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
