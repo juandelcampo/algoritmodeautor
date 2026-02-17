@@ -252,7 +252,7 @@
             if (t.includes('2')) t = t.split('2')[0];
             if (t.includes('/')) t = t.split('/')[0];
 
-            const basura = [ 'pelicula completa', 'película completa', 'subtitulada', 'Watch: comedy, drama','subtitle', '-','480p', 'eng', 'dub','"', '~', 'cine', 'argentino', 'full', 'movie','subtitulado', 'español', 'espanol', 'latino', 'audio', 'hd', '4k', '1080p', '720p', 'oficial', 'trailer', 'cortometraje', 'documental' ];
+            const basura = [ 'pelicula completa', 'película completa', 'subtitulada', 'lth', 'Watch: comedy, drama','subtitle', '-','480p', 'eng', 'dub','"', '~', 'cine', 'argentino', 'full', 'movie','subtitulado', 'español', 'espanol', 'latino', 'audio', 'hd', '4k', '1080p', '720p', 'oficial', 'trailer', 'cortometraje', 'documental' ];
             basura.forEach(palabra => { t = t.replace(new RegExp(palabra, 'gi'), ''); });
             return t.trim().replace(/^[-|]+|[-|]+$/g, '').trim();
         }
