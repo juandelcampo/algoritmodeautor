@@ -205,7 +205,7 @@
         const HERO_PLAYLIST_ID = "PLV7ZM4nm6CtLwkaoAb6_4SxpW9Xn6cRcM"; 
 
         const categories = [
-
+            { playlistId: "PLV7ZM4nm6CtKLpBKx3ZWIAdGHnNF6w8SS", title: "Destacadas", type: "genre" },
             { playlistId: "PLV7ZM4nm6CtLez0TwVAwv-0ZTF9vZt6sM", title: "Drama", type: "genre" },
             { playlistId: "PLV7ZM4nm6CtJNiGHg3OziNp7QnB7J6QOm", title: "Comedia", type: "genre" },
             { playlistId: "PLV7ZM4nm6CtJki16toQetCi51p-CJ04Rt", title: "Acción", type: "genre" },              
@@ -251,6 +251,7 @@
             if (t.includes('1')) t = t.split('1')[0];
             if (t.includes('2')) t = t.split('2')[0];
             if (t.includes('/')) t = t.split('/')[0];
+            if (t.includes('《')) t = t.split('《')[0];
 
             const basura = [ 'pelicula completa', 'película completa', 'subtitulada', 'Length', 'Watch: comedy, drama','subtitle', '-','480p', 'eng', 'dub','"', '~', 'cine', 'argentino', 'full', 'movie','subtitulado', 'español', 'espanol', 'latino', 'audio', 'hd', '4k', '1080p', '720p', 'oficial', 'trailer', 'cortometraje', 'documental' ];
             basura.forEach(palabra => { t = t.replace(new RegExp(palabra, 'gi'), ''); });
