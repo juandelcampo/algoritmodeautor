@@ -40,7 +40,7 @@
         .genre-chip:hover { background: #fff; color: #000; border-color: #fff; transform: scale(1.05); }
 
         /* --- SECCIÓN HERO FULL BLEED --- */
-        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; }
+        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; transition: opacity 0.3s ease; }
         .hero-carousel { display: flex; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
         .hero-carousel::-webkit-scrollbar { display: none; }
         .hero-slide { flex: 0 0 100%; height: 100%; position: relative; background-size: cover; background-position: center top; scroll-snap-align: start; display: flex; align-items: flex-end; padding-bottom: 8%; }
@@ -52,7 +52,7 @@
         .hero-btn { font-size: 4rem; width: 70px; }
 
         /* --- CONTENEDOR DE LISTAS --- */
-        .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; }
+        .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; transition: padding-top 0.3s ease; }
         .row { margin-bottom: 40px; position: relative; }
         .row-title { font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); display: flex; align-items: center; }
         .row-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background-color: var(--netflix-red); margin-right: 12px; border-radius: 2px; }
@@ -74,6 +74,18 @@
         .movie-info { padding: 12px 4px 0 4px; color: #ffffff; text-align: center; font-size: 1.1rem; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; opacity: 0.8; transition: opacity 0.3s ease; }
         .movie-card-wrapper:hover .movie-info { opacity: 1; color: var(--netflix-red); }
         .duration-overlay { position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: #fff; padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; font-weight: 600; pointer-events: none; }
+
+        /* --- ESTADOS DE BÚSQUEDA (MODO GRILLA) --- */
+        body.is-searching #hero-wrapper { display: none !important; }
+        body.is-searching .main-content { padding-top: 100px; min-height: 100vh; }
+        body.is-searching .row-title { display: none; } /* Oculta títulos de filas para hacer una grilla continua */
+        body.is-searching .row { margin-bottom: 0; }
+        body.is-searching .row-posters { flex-wrap: wrap; justify-content: flex-start; overflow-x: hidden; padding: 0 4% 20px 4%; gap: 20px; }
+        body.is-searching .scroll-btn { display: none !important; }
+        body.is-searching .movie-card-wrapper { margin-bottom: 25px; }
+
+        #search-results-title { display: none; font-size: 2.2rem; margin-bottom: 30px; padding: 0 4%; font-weight: 700; color: #fff; }
+        body.is-searching #search-results-title { display: block; }
 
         /* --- MODAL DE DETALLES DE PELÍCULA --- */
         .modal-overlay {
@@ -195,7 +207,8 @@
     </div>
 
     <div class="main-content" id="app">
-        <div class="loading-global"><div class="spinner"></div> Cargando cartelera...</div>
+        <h2 id="search-results-title"></h2>
+        <div class="loading-global" id="loading-global"><div class="spinner"></div> Cargando cartelera...</div>
     </div>
 
     <div id="movie-modal" class="modal-overlay">
@@ -272,8 +285,14 @@
         }
 
         function cleanTitle(title) {
+            const excepciones = {
+                "el viaja al pasado y cambia el futuro pelí argentina": "Querida, voy a comprar cigarrillos y vuelvo"
+            };
+
+            const tituloNormalizado = title.toLowerCase().trim();
+            if (excepciones[tituloNormalizado]) { return excepciones[tituloNormalizado]; }
+           
             let t = title;
-            
             const titleLower = t.toLowerCase();
             const isSeries = titleLower.includes('backrooms') || titleLower.includes('la flor');
 
@@ -284,12 +303,8 @@
             }
 
             const directores = [
-                'Werner Herzog', 'Herzog', 
-                'Andrei Tarkovsky', 'Tarkovsky', 
-                'Ingmar Bergman', 'Bergman', 
-                'Leonardo Favio', 'Favio',
-                'Mariano Llinás', 'Llinás', 
-                'Raúl Perrone', 'Perrone'
+                'Werner Herzog', 'Herzog', 'Andrei Tarkovsky', 'Tarkovsky', 'Ingmar Bergman', 'Bergman', 
+                'Leonardo Favio', 'Favio', 'Mariano Llinás', 'Llinás', 'Raúl Perrone', 'Perrone'
             ];
             
             directores.forEach(d => {
@@ -314,24 +329,33 @@
                 '8KR REMASTER', '480p', '720p', '1080p', '4k', 'hd', 'hq', 'eng', 'dub',
                 'cine', 'argentino', 'full', 'movie', 'español', 'espanol', 'latino', 'audio', 'Película', '|1974',
                 'oficial', 'trailer', 'cortometraje', 'documental',
-                'rip', 'x264', 'x265', 'cpg', 'mkv', 'mp4', 'avi', 'bluray', 'persian','brrip', 'webrip', 'dvdrip', 'hdtv', 'hevc', 'aac' 
+                'rip', 'x264', 'x265', 'cpg', 'mkv', 'mp4', '【',  'avi', 'bluray', 'persian', '▶ ','brrip', 'webrip', 'dvdrip', 'hdtv', 'hevc', 'aac' 
             ];
             
-            basura.forEach(palabra => { 
-                t = t.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), ''); 
-            });
+            basura.forEach(palabra => { t = t.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), ''); });
 
-            const basuraExtra = ['Raúl Perrone', 'Jorge Nisco', 'Dir. Kim Ki-young', ' -Sergio Renan', 'Akira Kurosawa', 'Gustavo Postiglione', 'Orson Welles’ ', 'Is a Beautiful Nightmare', ', Comèdia', 'muy buena pelicula', 'Emilio Estevez, Samuel L Jackson, Tim Curry, William Shatner & Jon Lovitz', 'Jorge Nisco', 'by Sogo Ishii', 'Animated Cartoon', 'with English Subtitles', '星河战队1: Bd','Alejandro Jodorowsky', '-Hollywood Action Adventure English','Alejandro Chomski', 'Pablo Trapero', 'Il Postino: ','Esteban Sapir', 'Western', ', la', 'Alfred Hitchcock', 'Ingmar Bergman', 'de Mariano Llinas', '-- Sub.', '- Werner Herzog','Matt Damon, Monica Bellucci In', 'Vera Fogwill', 'J. Švankmajer','Israel Adrián Caetano', 'Burt Lancaster, Audrey Hepburn,','• Rare Polish Dark Surrealism •','•', '"', '~'];
+            const basuraExtra = ['Raúl Perrone', 'Jorge Nisco', 'Dir. Kim Ki-young', "Remaster", ". John Carpenter",
+                                 ".de - en, ", "by Nikos Nikolaidis ", "Fernando Ayala", "Alejandro Agresti", "Néstor Montalbano", 
+                                 "John Cassavetes", "Daniel Barone", "Buster Keaton in ", "by Martin Scorsese", "Film with Subtitles", 
+                                 "Leonardo Di Cesare", 'Youtube 360P', 'Juan José Jusid',  'Adolfo Aristarain', '-luis Buñuel', 
+                                 'Juan José Campanella', 'Freudian Psychoanalyst Art Garfunkel Possesses Theresa Russell in Nicolas Roegs', 
+                                 'Abbas Kiarostami Completa', 'D. Pettinari', '—1973— Wojciech Has】multi-𝗦𝗨𝗕】', 
+                                 ' -Sergio Renan', 'Akira Kurosawa', 'Gustavo Postiglione', 'Orson Welles’ ', 
+                                 'Is a Beautiful Nightmare', ', Comèdia', 'muy buena pelicula', 
+                                 'Emilio Estevez, Samuel L Jackson, Tim Curry, William Shatner & Jon Lovitz', 'Jorge Nisco', 
+                                 'by Sogo Ishii', 'Animated Cartoon', 'with English Subtitles', '星河战队1: Bd','Alejandro Jodorowsky', 
+                                 '-Hollywood Action Adventure English','Alejandro Chomski', 'Pablo Trapero', 'Il Postino: ','Esteban Sapir', 
+                                 'Western', ', la', 'Alfred Hitchcock', 'Ingmar Bergman', 'de Mariano Llinas', '-- Sub.', '- Werner Herzog',
+                                 'Matt Damon, Monica Bellucci In', 'Vera Fogwill', 'J. Švankmajer','Israel Adrián Caetano', 
+                                 'Burt Lancaster, Audrey Hepburn,','• Rare Polish Dark Surrealism •','•', '"', '~'];
             basuraExtra.forEach(frase => {
                 t = t.replace(new RegExp(frase, 'gi'), '');
             });
 
             t = t.replace(/^[-|:,\.\s]+|[-|:,\.\s]+$/g, '');
-
             t = t.toLowerCase();
             
             const minWords = ['de', 'del', 'la', 'el', 'los', 'las', 'y', 'o', 'a', 'en', 'un', 'una', 'of', 'the', 'and', 'in', 'to', 'for', 'with', 'on', 'at', 'by'];
-            
             t = t.split(/\s+/).map((word, index) => {
                 if (!word) return '';
                 const pureWord = word.replace(/[^a-z]/g, '');
@@ -352,10 +376,7 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 return data[0].map(item => item[0]).join('');
-            } catch (error) {
-                console.error("Error traduciendo al español:", error);
-                return text; 
-            }
+            } catch (error) { return text; }
         }
 
         async function translateToEnglish(text) {
@@ -365,10 +386,7 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 return data[0].map(item => item[0]).join('');
-            } catch (error) {
-                console.error("Error traduciendo al inglés:", error);
-                return text; 
-            }
+            } catch (error) { return text; }
         }
 
         async function initApp() {
@@ -379,7 +397,7 @@
 
             try {
                 await loadHeroCarousel();
-                appContainer.innerHTML = ''; 
+                document.getElementById('loading-global').style.display = 'none';
 
                 const rowElements = categories.map(category => {
                     const sectionId = generateSlug(category.title);
@@ -545,16 +563,13 @@
 
         function cleanYouTubeDescription(desc) {
             if (!desc) return "";
-            
             let cleaned = desc.replace(/https?:\/\/[^\s]+/g, '').replace(/www\.[^\s]+/g, '');
             cleaned = cleaned.replace(/#\S+/g, '');
             cleaned = cleaned.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim();
-            
             if (cleaned.length > 250) {
                 cleaned = cleaned.substring(0, 250);
                 cleaned = cleaned.substring(0, Math.min(cleaned.length, cleaned.lastIndexOf(" "))) + "...";
             }
-            
             return cleaned;
         }
 
@@ -574,7 +589,7 @@
             document.getElementById('modal-year').innerText = "YouTube";
             document.getElementById('modal-runtime').innerText = duration || "- min";
             document.getElementById('modal-genre-full').innerText = "Cargando..."; 
-            document.getElementById('modal-country').innerText = "Cargando..."; // Reset de país
+            document.getElementById('modal-country').innerText = "Cargando..."; 
             document.getElementById('modal-rating').innerText = "N/A";
             document.getElementById('modal-director').innerText = "Desconocido";
             document.getElementById('modal-actors').innerText = "Desconocido";
@@ -586,11 +601,9 @@
             const cleanYtDesc = cleanYouTubeDescription(ytDescription);
 
             try {
-                // 1. Intento original
                 let response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
                 let data = await response.json();
 
-                // 2. Búsqueda por lista si no encuentra el título exacto
                 if (data.Response === "False") {
                     const searchResp = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
                     const searchData = await searchResp.json();
@@ -601,10 +614,8 @@
                     }
                 }
 
-                // 3. Traducción al inglés y reintento
                 if (data.Response === "False") {
                     const englishTitle = await translateToEnglish(cleanUiTitle);
-                    
                     if (englishTitle.toLowerCase() !== cleanUiTitle.toLowerCase()) {
                         response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(englishTitle)}&apikey=${OMDB_API_KEY}`);
                         data = await response.json();
@@ -623,7 +634,7 @@
 
                 let textToTranslate = "Sin descripción disponible.";
                 let genreToTranslate = "";
-                let countryToTranslate = ""; // Variable para el país
+                let countryToTranslate = ""; 
 
                 if (data.Response === "True") {
                     if(data.Poster !== "N/A") document.getElementById('modal-poster').src = data.Poster;
@@ -635,7 +646,6 @@
                     document.getElementById('modal-actors').innerText = data.Actors;
                     
                     genreToTranslate = data.Genre !== "N/A" ? data.Genre : "";
-                    // Capturamos el país de OMDb
                     countryToTranslate = data.Country !== "N/A" ? data.Country : "";
 
                     if (data.Plot && data.Plot !== "N/A") {
@@ -647,7 +657,6 @@
                     textToTranslate = cleanYtDesc;
                 }
 
-                // Traducción simultánea de Sinopsis, Género y País
                 const [finalPlot, finalGenre, finalCountry] = await Promise.all([
                     translateToSpanish(textToTranslate),
                     genreToTranslate ? translateToSpanish(genreToTranslate) : Promise.resolve(""),
@@ -656,7 +665,6 @@
 
                 document.getElementById('modal-plot').innerText = finalPlot;
                 document.getElementById('modal-genre-full').innerText = finalGenre || "No disponible";
-                // Asignamos el país traducido
                 document.getElementById('modal-country').innerText = finalCountry || "No disponible";
 
             } catch (error) {
@@ -707,7 +715,6 @@
             const uiTitle = cleanTitle(originalTitle); 
             
             const thumbnails = snippet.thumbnails;
-            // Buscamos SIEMPRE la resolución máxima que nos pueda dar YouTube para que no se vea borroso
             const ytImgUrl = thumbnails?.maxres?.url || thumbnails?.standard?.url || thumbnails?.high?.url || thumbnails?.medium?.url || 'https://via.placeholder.com/280x157/222/555?text=CineTube';
 
             const cardWrapper = document.createElement('div'); 
@@ -756,27 +763,55 @@
             return `${mm}:${pad(ss)}`;
         }
 
-        // Evento de búsqueda
+        // --- SISTEMA DE BÚSQUEDA ACTUALIZADO ---
         document.getElementById('search-bar').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
+            const searchTerm = e.target.value.toLowerCase().trim();
             const rows = document.querySelectorAll('.row');
+            const searchTitleEl = document.getElementById('search-results-title');
 
-            rows.forEach(row => {
-                const cards = row.querySelectorAll('.movie-card-wrapper');
-                let hasVisibleCards = false;
+            if (searchTerm.length > 0) {
+                // Activar modo búsqueda en todo el body
+                document.body.classList.add('is-searching');
+                let totalMatches = 0;
 
-                cards.forEach(card => {
-                    const title = card.querySelector('.movie-info').innerText.toLowerCase();
-                    if (title.includes(searchTerm)) {
-                        card.style.display = 'block'; 
-                        hasVisibleCards = true;
-                    } else {
-                        card.style.display = 'none'; 
-                    }
+                rows.forEach(row => {
+                    const cards = row.querySelectorAll('.movie-card-wrapper');
+                    let hasVisibleCards = false;
+
+                    cards.forEach(card => {
+                        const title = card.querySelector('.movie-info').innerText.toLowerCase();
+                        if (title.includes(searchTerm)) {
+                            card.style.display = 'block'; 
+                            hasVisibleCards = true;
+                            totalMatches++;
+                        } else {
+                            card.style.display = 'none'; 
+                        }
+                    });
+
+                    // Si la fila entera no tiene resultados, la ocultamos de la grilla
+                    row.style.display = hasVisibleCards ? 'block' : 'none';
                 });
 
-                row.style.display = hasVisibleCards ? 'block' : 'none';
-            });
+                // Actualizar el título dinámico
+                if (totalMatches > 0) {
+                    searchTitleEl.innerText = `Resultados para: "${e.target.value}"`;
+                } else {
+                    searchTitleEl.innerText = `No se encontraron resultados para: "${e.target.value}"`;
+                }
+
+            } else {
+                // Restaurar vista original si la barra está vacía
+                document.body.classList.remove('is-searching');
+                
+                rows.forEach(row => {
+                    row.style.display = 'block';
+                    const cards = row.querySelectorAll('.movie-card-wrapper');
+                    cards.forEach(card => {
+                        card.style.display = 'block'; 
+                    });
+                });
+            }
         });
 
         // Evento de scroll para el header oscuro
