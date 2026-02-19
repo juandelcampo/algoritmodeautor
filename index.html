@@ -17,7 +17,7 @@
             --bg-color: #0a0b0e; 
             --bg-surface: #14161a; 
             --text-color: #ecebe6; 
-            --text-muted: #8a8d93; 
+            --text-muted: #dce1eb; /* NUEVO COLOR MUTED MÁS CLARO Y ELEGANTE */
             --accent-color: #d4af37; /* Oro Cinematográfico */
             
             --font-ui: 'Outfit', sans-serif;
@@ -53,25 +53,40 @@
         .dropdown-content a { color: var(--text-muted); padding: 10px 20px; text-decoration: none; display: block; font-size: 0.95rem; font-weight: 300; transition: all 0.2s; }
         .dropdown-content a:hover { background-color: rgba(255, 255, 255, 0.03); color: var(--accent-color); padding-left: 25px; border-left: 2px solid var(--accent-color); }
 
-        /* --- PÍLDORAS DE GÉNEROS (ESTILO CLÁSICO GRANDE) --- */
+        /* --- PÍLDORAS DE GÉNEROS --- */
         .genres-menu { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding: 5px 0; }
         .genres-menu::-webkit-scrollbar { display: none; }
         .genre-chip { color: rgba(255, 255, 255, 0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 18px; border-radius: 20px; background: rgba(255, 255, 255, 0.1); white-space: nowrap; border: 1px solid transparent; transition: all 0.3s ease; }
         .genre-chip:hover { background: #fff; color: #000; border-color: #fff; transform: scale(1.05); }
 
         /* --- SECCIÓN HERO FULL BLEED --- */
-        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; transition: opacity 0.3s ease; border-bottom: 1px solid rgba(255,255,255,0.05);}
+        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; transition: opacity 0.3s ease; }
+        
+        /* NUEVO: FADE INFERIOR PROFUNDO PARA FUNDIRSE CON EL FONDO */
+        .hero-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 25vh; /* Altura del fundido */
+            background: linear-gradient(to top, var(--bg-color) 0%, transparent 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
         .hero-carousel { display: flex; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
         .hero-carousel::-webkit-scrollbar { display: none; }
+        
         .hero-slide { flex: 0 0 100%; height: 100%; position: relative; background-size: cover; background-position: center top; scroll-snap-align: start; display: flex; align-items: flex-end; padding-bottom: 8%; overflow: hidden;}
-        .hero-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(10,11,14,0.95) 0%, rgba(10,11,14,0.4) 50%, transparent 100%), linear-gradient(to top, rgba(10,11,14,1) 0%, rgba(10,11,14,0.3) 40%, transparent 100%); z-index: 1; }
+        /* Sombra izquierda y sombra extra de fondo */
+        .hero-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(10,11,14,0.95) 0%, rgba(10,11,14,0.4) 50%, transparent 100%), linear-gradient(to top, rgba(10,11,14,0.8) 0%, rgba(10,11,14,0.3) 40%, transparent 100%); z-index: 1; }
         
         .hero-video-bg { position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); z-index: 0; pointer-events: none; border: none; opacity: 0.8;}
 
-        .hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%; max-width: 800px; padding: 0 4%; }
+        /* Aumento del z-index para que el texto esté sobre el nuevo Fade */
+        .hero-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%; max-width: 800px; padding: 0 4%; }
         
         .hero-title { font-family: var(--font-display); font-size: 4rem; font-weight: 700; margin: 0 0 15px 0; line-height: 1.05; letter-spacing: 1px; text-shadow: 0 10px 30px rgba(0,0,0,0.9); color: var(--text-color); text-transform: uppercase; }
-        .hero-plot { font-size: 1.15rem; font-weight: 300; color: rgba(236, 235, 230, 0.85); text-shadow: 1px 1px 5px rgba(0,0,0,0.9); margin: 0 0 30px 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 90%; }
+        .hero-plot { font-size: 1.15rem; font-weight: 300; color: var(--text-muted); text-shadow: 1px 1px 5px rgba(0,0,0,0.9); margin: 0 0 30px 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 90%; }
         
         .info-btn { 
             display: inline-flex; align-items: center; gap: 12px; 
@@ -82,14 +97,13 @@
         }
         .info-btn:hover { background-color: var(--text-color); color: var(--bg-color); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         
-        .hero-btn { font-size: 4rem; width: 70px; background: transparent; color: rgba(255,255,255,0.3); border: none; transition: color 0.3s;}
+        .hero-btn { font-size: 4rem; width: 70px; background: transparent; color: rgba(255,255,255,0.3); border: none; transition: color 0.3s; z-index: 200;}
         .hero-btn:hover { color: var(--accent-color); }
 
         /* --- CONTENEDOR DE LISTAS --- */
         .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; transition: padding-top 0.3s ease; }
         .row { margin-bottom: 50px; position: relative; }
         
-        /* Título de la fila: MAYÚSCULAS */
         .row-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 400; letter-spacing: 1px; color: var(--text-color); display: flex; align-items: center; text-transform: uppercase;}
         .row-title::before { content: ''; display: inline-block; width: 3px; height: 22px; background-color: var(--accent-color); margin-right: 15px; }
         
@@ -111,7 +125,6 @@
         .thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .movie-card-wrapper:hover .thumbnail { transform: scale(1.08); } 
         
-        /* Título debajo de la miniatura: Centrado, Sans-Serif y más grande */
         .movie-info { 
             padding: 14px 4px 0 4px; 
             color: var(--text-color); 
@@ -170,7 +183,7 @@
         .modal-close { position: absolute; top: 25px; right: 30px; background: transparent; border: none; color: var(--text-muted); font-size: 1.8rem; font-weight: 300; cursor: pointer; transition: color 0.3s; z-index: 10; font-family: var(--font-ui);}
         .modal-close:hover { color: var(--text-color); transform: scale(1.1); }
 
-        .modal-poster { width: 32%; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); object-fit: cover; aspect-ratio: 2/3; }
+        .modal-poster { width: 32%; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); object-fit: cover; aspect-ratio: 2/3; }
         
         .modal-info-text { width: 68%; display: flex; flex-direction: column; }
         .modal-title { font-family: var(--font-display); font-size: 2.8rem; margin: 0 0 10px 0; line-height: 1.1; color: var(--text-color);}
@@ -494,7 +507,7 @@
             }
         }
 
-        // --- FUNCIÓN ASÍNCRONA PARA TRAER SINOPSIS DEL HERO ---
+        // --- FUNCIÓN SECUENCIAL PARA LAS SINOPSIS DEL HERO ---
         async function fetchHeroPlot(cleanUiTitle, ytDesc, elementId) {
             const plotEl = document.getElementById(elementId);
             if (!plotEl) return;
@@ -524,15 +537,13 @@
             }
         }
 
-        // Ejecuta la búsqueda de sinopsis en secuencia con una pequeña pausa para no bloquear a Google Translate
         async function loadAllHeroPlotsSequential(videosArray) {
             for (let i = 0; i < videosArray.length; i++) {
                 const uiTitle = cleanTitle(videosArray[i].snippet.title);
                 const desc = videosArray[i].snippet.description;
                 const plotId = `hero-plot-${videosArray[i].snippet.resourceId.videoId}-${i}`;
                 await fetchHeroPlot(uiTitle, desc, plotId);
-                
-                // Pausa de 600ms entre cada solicitud para evitar el error 429 (Too Many Requests)
+                // Pausa sutil entre cada llamado para que Google Translate no nos bloquee
                 await new Promise(r => setTimeout(r, 600)); 
             }
         }
@@ -558,19 +569,17 @@
 
                 const slide = document.createElement('div');
                 slide.className = 'hero-slide';
+                slide.style.backgroundImage = `url('${imgUrl}')`;
 
                 let startAt = (index === 0) ? 600 : 0;
 
-                if (index === 0) {
-                    slide.innerHTML = `
-                        <iframe class="hero-video-bg" 
-                            src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&loop=1&playlist=${videoId}&start=${startAt}" 
-                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-                        </iframe>
-                    `;
-                } else {
-                    slide.style.backgroundImage = `url('${imgUrl}')`;
-                }
+                // Preparamos el iframe (usamos data-src para cargarlo cuando esté visible)
+                slide.innerHTML = `
+                    <iframe class="hero-video-bg" 
+                        data-src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&loop=1&playlist=${videoId}&start=${startAt}" 
+                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                    </iframe>
+                `;
 
                 const content = document.createElement('div');
                 content.className = 'hero-content';
@@ -601,7 +610,22 @@
             carousel.appendChild(fragment);
             wrapper.style.display = 'block';
 
-            // Ejecutamos la carga de reseñas secuencial para que no se trabe
+            // INTERSECTION OBSERVER: Reproduce los videos SOLO cuando los estás mirando
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const iframe = entry.target.querySelector('.hero-video-bg');
+                    if (entry.isIntersecting) {
+                        if (!iframe.src) iframe.src = iframe.dataset.src;
+                    } else {
+                        // Al salir de la vista, lo apagamos para no saturar la PC
+                        iframe.src = ''; 
+                    }
+                });
+            }, { root: carousel, threshold: 0.5 });
+
+            document.querySelectorAll('.hero-slide').forEach(slide => observer.observe(slide));
+
+            // Cargamos las reseñas una por una
             loadAllHeroPlotsSequential(videos);
         }
 
