@@ -54,9 +54,9 @@
         /* --- CONTENEDOR DE LISTAS --- */
         .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; transition: padding-top 0.3s ease; }
         .row { margin-bottom: 40px; position: relative; }
-        .row-title { font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); display: flex; align-items: center; }
+        .row-title { font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); display: flex; align-items: center; transition: all 0.3s ease; }
         .row-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background-color: var(--netflix-red); margin-right: 12px; border-radius: 2px; }
-        .row-posters { display: flex; overflow-y: visible; overflow-x: auto; padding: 20px 4%; gap: 15px; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
+        .row-posters { display: flex; overflow-y: visible; overflow-x: auto; padding: 20px 4%; gap: 15px; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; transition: all 0.3s ease; }
         .row-posters::-webkit-scrollbar { display: none; }
         .scroll-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 100%; background: rgba(15,15,15,0.6); border: none; color: #fff; font-size: 3rem; cursor: pointer; z-index: 200; opacity: 0; transition: opacity 0.3s ease, background 0.3s ease; }
         .row:hover .scroll-btn, .hero-wrapper:hover .scroll-btn { opacity: 0.8; }
@@ -285,8 +285,15 @@
         }
 
         function cleanTitle(title) {
+            // Diccionario de excepciones: LA CLAVE DEBE ESTAR TODA EN MINÚSCULAS para que coincida.
             const excepciones = {
-                "el viaja al pasado y cambia el futuro pelí argentina": "Querida, voy a comprar cigarrillos y vuelvo"
+                "el viaja al pasado y cambia el futuro (querida voy a comprar cigarros y vuelvo) 4k pelí argentina": "Querida, voy a comprar cigarrillos y vuelvo",
+                "la película argentina que predice el futuro / fase 7 [ película completa] con yayo": "Fase 7",
+                "david lynch's - hotel room (1993) [subtitulado al español]": "Hotel Room", 
+                "alfred hitchcock | the man who knew too much (1934) crime, mystery, thriller | movie, subtitles": "The Man Who Knew Too Much",
+                '📽️"m - eine stadt sucht einen mörder".🎥fritz lang.1931/restored version/hd/deutsche-english-español🎦': "M - Eine Stadt sucht einen Mörder",
+
+
             };
 
             const tituloNormalizado = title.toLowerCase().trim();
@@ -324,27 +331,27 @@
             }
 
             const basura = [ 
-                'pelicula completa', 'película completa', 'subtitulada', 'subtitulado', 'subtítulos', 'subtitle', 
+                'pelicula completa', 'película completa', 'subtitulada', 'subtitulado', 'subtítulos', 'Subtitulos','subtitle', 
                 'Brian De Palma', 'Documentary', 'criterion', 'Length', 'Watch', 'comedy', 'drama',
                 '8KR REMASTER', '480p', '720p', '1080p', '4k', 'hd', 'hq', 'eng', 'dub',
                 'cine', 'argentino', 'full', 'movie', 'español', 'espanol', 'latino', 'audio', 'Película', '|1974',
                 'oficial', 'trailer', 'cortometraje', 'documental',
-                'rip', 'x264', 'x265', 'cpg', 'mkv', 'mp4', '【',  'avi', 'bluray', 'persian', '▶ ','brrip', 'webrip', 'dvdrip', 'hdtv', 'hevc', 'aac' 
+                'rip', 'x264', 'x265', 'cpg', 'mkv', 'mp4', 'Blu-ray','【',  'avi', 'bluray', 'persian', '▶','brrip', 'webrip', 'dvdrip', 'hdtv', 'hevc', 'aac' 
             ];
             
             basura.forEach(palabra => { t = t.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), ''); });
 
-            const basuraExtra = ['Raúl Perrone', 'Jorge Nisco', 'Dir. Kim Ki-young', "Remaster", ". John Carpenter",
-                                 ".de - en, ", "by Nikos Nikolaidis ", "Fernando Ayala", "Alejandro Agresti", "Néstor Montalbano", 
+            const basuraExtra = ['Raúl Perrone', 'Gory Splatter Fest of a Film', '- Uk Ep 1-3', '35Mm Scan', "Peter Jackson's", '. This Is the - Japanese Paganistic Film From', 'Jorge Nisco', 'Dir. Kim Ki-young', 'Remaster', '. John Carpenter', "de - en", "Alemania Occidental",
+                                 ".de - en, ", "by Nikos Nikolaidis ", "Fernando Ayala", "Alejandro Agresti", "Néstor Montalbano", "Fhd", 
                                  "John Cassavetes", "Daniel Barone", "Buster Keaton in ", "by Martin Scorsese", "Film with Subtitles", 
                                  "Leonardo Di Cesare", 'Youtube 360P', 'Juan José Jusid',  'Adolfo Aristarain', '-luis Buñuel', 
                                  'Juan José Campanella', 'Freudian Psychoanalyst Art Garfunkel Possesses Theresa Russell in Nicolas Roegs', 
                                  'Abbas Kiarostami Completa', 'D. Pettinari', '—1973— Wojciech Has】multi-𝗦𝗨𝗕】', 
-                                 ' -Sergio Renan', 'Akira Kurosawa', 'Gustavo Postiglione', 'Orson Welles’ ', 
-                                 'Is a Beautiful Nightmare', ', Comèdia', 'muy buena pelicula', 
+                                 ' -Sergio Renan', 'Akira Kurosawa', 'with English','Gustavo Postiglione', 'Orson Welles’ ', 
+                                 'Is a Beautiful Nightmare', 'Santiago Carlos Oves', '. Koniec Cywilizacji', 'Is a Beautiful Nightmare','Film with Subtitles', 'Comèdia', 'muy buena pelicula',  'Subtitulos en', 'Te Doy Mi Alma, Carl Jung,', 
                                  'Emilio Estevez, Samuel L Jackson, Tim Curry, William Shatner & Jon Lovitz', 'Jorge Nisco', 
-                                 'by Sogo Ishii', 'Animated Cartoon', 'with English Subtitles', '星河战队1: Bd','Alejandro Jodorowsky', 
-                                 '-Hollywood Action Adventure English','Alejandro Chomski', 'Pablo Trapero', 'Il Postino: ','Esteban Sapir', 
+                                 'by Sogo Ishii', '1 en la Isla de Berk ', 'Animated Cartoon', 'with English Subtitles', '星河战队1: Bd','Alejandro Jodorowsky', 
+                                 '-Hollywood Action Adventure English','Pelicula argentina','Alejandro Chomski', 'Pablo Trapero', 'Il Postino: ','Esteban Sapir', 
                                  'Western', ', la', 'Alfred Hitchcock', 'Ingmar Bergman', 'de Mariano Llinas', '-- Sub.', '- Werner Herzog',
                                  'Matt Damon, Monica Bellucci In', 'Vera Fogwill', 'J. Švankmajer','Israel Adrián Caetano', 
                                  'Burt Lancaster, Audrey Hepburn,','• Rare Polish Dark Surrealism •','•', '"', '~'];
