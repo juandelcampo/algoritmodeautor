@@ -85,12 +85,25 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow-y: auto;
             position: relative;
-            display: flex; flex-direction: row; gap: 30px;
             padding: 40px; box-sizing: border-box;
             transform: translateY(50px);
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        #modal-details {
+            display: flex; flex-direction: row; gap: 30px; width: 100%;
+        }
+
+        /* --- REPRODUCTOR DE VIDEO --- */
+        #video-container {
+            display: none;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
 
         .modal-close {
             position: absolute; top: 20px; right: 25px;
@@ -98,12 +111,13 @@
             width: 40px; height: 40px; border-radius: 50%;
             font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: background 0.2s;
+            z-index: 10;
         }
         .modal-close:hover { background: rgba(255,255,255,0.2); }
 
         .modal-poster { width: 35%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); object-fit: cover; aspect-ratio: 2/3; }
         
-        .modal-info { width: 65%; display: flex; flex-direction: column; }
+        .modal-info-text { width: 65%; display: flex; flex-direction: column; }
         .modal-title { font-size: 2.5rem; margin: 0 0 10px 0; line-height: 1.1; }
         
         .modal-meta { display: flex; gap: 15px; color: #a3a3a3; font-size: 0.9rem; margin-bottom: 20px; align-items: center; flex-wrap: wrap;}
@@ -116,7 +130,7 @@
         .modal-play-btn { margin-top: auto; display: inline-flex; justify-content: center; margin-top: 30px;}
 
         /* Loading local para el modal */
-        .modal-loading { position: absolute; inset: 0; background: #141414; display: flex; justify-content: center; align-items: center; z-index: 10; border-radius: 12px; }
+        .modal-loading { position: absolute; inset: 0; background: #141414; display: flex; justify-content: center; align-items: center; z-index: 20; border-radius: 12px; }
         .loading-global { display: flex; justify-content: center; align-items: center; height: 60vh; font-size: 1.5rem; color: #888; }
         .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--netflix-red); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-right: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -125,8 +139,8 @@
            MEDIA QUERIES - OPTIMIZACIÓN MÓVIL 
            ========================================= */
         @media (max-width: 900px) {
-            header { display: none; } /* Oculta el header completamente en móviles */
-            html { scroll-padding-top: 0; } /* Resetea el padding ya que no hay header estático */
+            header { display: none; }
+            html { scroll-padding-top: 0; } 
             .scroll-btn { display: none !important; }
             .row-posters { padding-bottom: 10px; }
             .hero-wrapper { height: 70vh; min-height: 450px; }
@@ -135,11 +149,12 @@
             .hero-title { font-size: 2.2rem; margin-bottom: 15px; }
             .play-btn { padding: 10px 25px; font-size: 0.9rem; }
             .row-title { font-size: 3rem; }
-            .main-content { margin-top: 0; } /* Remueve el margen superior innecesario */
+            .main-content { margin-top: 0; } 
             
-            .modal-content { flex-direction: column; padding: 25px 20px; gap: 20px; overflow-y: auto;}
+            .modal-content { padding: 25px 20px; }
+            #modal-details { flex-direction: column; gap: 20px; }
             .modal-poster { width: 50%; margin: 0 auto; aspect-ratio: auto;}
-            .modal-info { width: 100%; }
+            .modal-info-text { width: 100%; }
             .modal-title { font-size: 1.8rem; }
             .modal-close { top: 10px; right: 10px; background: rgba(0,0,0,0.5); }
         }
@@ -177,23 +192,27 @@
             <button class="modal-close" onclick="closeModal()">✕</button>
             <div id="modal-loader" class="modal-loading"><div class="spinner"></div></div>
             
-            <img id="modal-poster" class="modal-poster" src="" alt="Poster">
-            
-            <div class="modal-info">
-                <h2 id="modal-title" class="modal-title">Título de la película</h2>
-                <div class="modal-meta">
-                    <span id="modal-year">2023</span>
-                    <span id="modal-runtime">120 min</span>
-                    <span class="imdb-badge">IMDb <span id="modal-rating">N/A</span></span>
-                </div>
-                <p id="modal-plot" class="modal-plot">Cargando sinopsis...</p>
-                <div class="modal-cast">Director: <span id="modal-director">-</span></div>
-                <div class="modal-cast">Elenco: <span id="modal-actors">-</span></div>
+            <div id="video-container"></div>
+
+            <div id="modal-details">
+                <img id="modal-poster" class="modal-poster" src="" alt="Poster">
                 
-                <a id="modal-play" class="play-btn modal-play-btn" href="#" target="_blank">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    Reproducir en YouTube
-                </a>
+                <div class="modal-info-text">
+                    <h2 id="modal-title" class="modal-title">Título de la película</h2>
+                    <div class="modal-meta">
+                        <span id="modal-year">2023</span>
+                        <span id="modal-runtime">120 min</span>
+                        <span class="imdb-badge">IMDb <span id="modal-rating">N/A</span></span>
+                    </div>
+                    <p id="modal-plot" class="modal-plot">Cargando sinopsis...</p>
+                    <div class="modal-cast">Director: <span id="modal-director">-</span></div>
+                    <div class="modal-cast">Elenco: <span id="modal-actors">-</span></div>
+                    
+                    <button id="modal-play" class="play-btn modal-play-btn" onclick="playVideo()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        Reproducir aquí
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -203,6 +222,9 @@
         const OMDB_API_KEY = 'dd75c1c5'; 
         const MAX_VIDEOS_PER_ROW = 100; 
         const HERO_PLAYLIST_ID = "PLV7ZM4nm6CtLwkaoAb6_4SxpW9Xn6cRcM"; 
+
+        // Variable global para almacenar el video seleccionado
+        let currentVideoId = "";
 
         const categories = [
             { playlistId: "PLV7ZM4nm6CtKLpBKx3ZWIAdGHnNF6w8SS", title: "Destacadas", type: "genre" },
@@ -238,7 +260,6 @@
             return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
         }
 
-        // --- SUPER LIMPIADOR DE TÍTULOS ---
         function cleanTitle(title) {
             let t = title;
             t = t.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '');
@@ -258,19 +279,16 @@
             return t.trim().replace(/^[-|]+|[-|]+$/g, '').trim();
         }
 
-        // --- NUEVO: FUNCIÓN MAGICA DE TRADUCCIÓN A ESPAÑOL ---
-        // Usa la API gratuita (y secreta) de Google Translate
         async function translateToSpanish(text) {
             if (!text || text === "N/A") return text;
             try {
                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(text)}`;
                 const response = await fetch(url);
                 const data = await response.json();
-                // Google devuelve la traducción dividida en fragmentos, la unimos:
                 return data[0].map(item => item[0]).join('');
             } catch (error) {
                 console.error("Error traduciendo al español:", error);
-                return text; // Si falla por alguna razón, deja el texto original en inglés
+                return text; 
             }
         }
 
@@ -432,14 +450,20 @@
             }
         }
 
-        // --- DOBLE BÚSQUEDA EN OMDb CON TRADUCCIÓN ---
         async function openMovieModal(videoId, cleanUiTitle, ytPosterUrl, duration, ytDescription) {
             const modal = document.getElementById('movie-modal');
             const loader = document.getElementById('modal-loader');
             
+            // Guardamos el ID del video actual
+            currentVideoId = videoId;
+            
+            // Reiniciamos la vista del modal limpiando cualquier rastro del video anterior
+            document.getElementById('video-container').innerHTML = '';
+            document.getElementById('video-container').style.display = 'none';
+            document.getElementById('modal-details').style.display = 'flex';
+
             document.getElementById('modal-title').innerText = cleanUiTitle; 
             document.getElementById('modal-poster').src = ytPosterUrl;
-            document.getElementById('modal-play').href = `https://www.youtube.com/watch?v=${videoId}`;
             document.getElementById('modal-plot').innerText = ytDescription || "Sin descripción en YouTube.";
             document.getElementById('modal-year').innerText = "YouTube";
             document.getElementById('modal-runtime').innerText = duration || "- min";
@@ -470,7 +494,6 @@
                     if(data.Title) document.getElementById('modal-title').innerText = data.Title;
                     if(data.Poster !== "N/A") document.getElementById('modal-poster').src = data.Poster;
                     
-                    // --- AQUÍ APLICAMOS LA MAGIA DE LA TRADUCCIÓN ---
                     let finalPlot = ytDescription || "Sin descripción.";
                     if (data.Plot && data.Plot !== "N/A") {
                         finalPlot = await translateToSpanish(data.Plot);
@@ -490,9 +513,39 @@
             loader.style.display = 'none';
         }
 
+// --- NUEVA FUNCIÓN PARA REPRODUCIR EL VIDEO (ANTI-ERROR 153) ---
+        function playVideo() {
+            // Ocultamos los detalles
+            document.getElementById('modal-details').style.display = 'none';
+            
+            // Mostramos el contenedor de video
+            const videoContainer = document.getElementById('video-container');
+            videoContainer.style.display = 'block';
+            
+            // Usamos youtube-nocookie y agregamos un origin falso para saltar restricciones locales/extensiones
+            videoContainer.innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1&rel=0&origin=https://www.youtube.com" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        }
+
+        // --- FUNCIÓN PARA CERRAR EL MODAL (CORREGIDA) ---
         function closeModal() {
             document.getElementById('movie-modal').classList.remove('active');
             document.body.style.overflow = 'auto'; 
+
+            // Destruimos el iframe por completo vaciando el contenedor
+            // Esto detiene el video al 100% y reinicia el modal
+            document.getElementById('video-container').innerHTML = '';
+            document.getElementById('video-container').style.display = 'none';
+            document.getElementById('modal-details').style.display = 'flex';
         }
 
         document.getElementById('movie-modal').addEventListener('click', function(e) {
