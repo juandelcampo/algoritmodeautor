@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Algoritmo de Autor</title>
-    <link rel="icon" type="image/ico" href="play-3-32.ico">
+    <link rel="icon" type="image/png" href="icons8-youtube-32.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
             --bg-color: #0a0b0e; 
             --bg-surface: #14161a; 
             --text-color: #ecebe6; 
-            --text-muted: #dce1eb; /* Muted más claro y elegante */
+            --text-muted: #dce1eb; 
             --accent-color: #d4af37; /* Oro Cinematográfico */
             
             --font-ui: 'Outfit', sans-serif;
@@ -37,7 +37,7 @@
         /* --- BARRA DE BÚSQUEDA --- */
         .search-container { margin-left: auto; display: flex; align-items: center; }
         .search-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-color); padding: 8px 15px; border-radius: 20px; outline: none; font-size: 0.9rem; font-family: var(--font-ui); transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); width: 130px; }
-        .search-input:focus { background: rgba(0, 0, 0, 0.8); border-color: var(--accent-color); width: 150px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);}
+        .search-input:focus { background: rgba(0, 0, 0, 0.8); border-color: var(--accent-color); width: 180px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);}
         .search-input::placeholder { color: rgba(236, 235, 230, 0.4); font-weight: 300;}
 
         /* --- DROPDOWNS (POR CLICK) --- */
@@ -62,7 +62,6 @@
         /* --- SECCIÓN HERO FULL BLEED --- */
         .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; transition: opacity 0.3s ease; border-bottom: 1px solid rgba(255,255,255,0.05);}
         
-        /* FADE INFERIOR PROFUNDO PARA FUNDIRSE CON EL FONDO */
         .hero-wrapper::after {
             content: '';
             position: absolute;
@@ -78,17 +77,13 @@
         
         .hero-slide { flex: 0 0 100%; height: 100%; position: relative; scroll-snap-align: start; display: flex; align-items: flex-end; padding-bottom: 8%; overflow: hidden;}
         
-        /* Capa 0: El reproductor de video de fondo */
         .hero-video-bg { position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); z-index: 0; pointer-events: none; border: none; opacity: 0.8;}
 
-        /* Capa 1: La imagen de portada (fade out cuando el video corre) */
         .hero-cover { position: absolute; inset: 0; background-size: cover; background-position: center top; z-index: 1; transition: opacity 1.5s ease-in-out; pointer-events: none; }
         .hero-slide.video-playing .hero-cover { opacity: 0; }
 
-        /* Capa 2: Degradado lateral para que los textos se lean bien */
         .hero-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(10,11,14,0.95) 0%, rgba(10,11,14,0.4) 50%, transparent 100%), linear-gradient(to top, rgba(10,11,14,0.8) 0%, rgba(10,11,14,0.3) 40%, transparent 100%); z-index: 2; pointer-events: none; }
         
-        /* Capa 10: Contenido (Textos y Botones) */
         .hero-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%; max-width: 800px; padding: 0 4%; }
         
         .hero-title { font-family: var(--font-display); font-size: 4rem; font-weight: 700; margin: 0 0 15px 0; line-height: 1.05; letter-spacing: 1px; text-shadow: 0 10px 30px rgba(0,0,0,0.9); color: var(--text-color); text-transform: uppercase; }
@@ -110,7 +105,6 @@
         .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; transition: padding-top 0.3s ease; }
         .row { margin-bottom: 50px; position: relative; }
         
-        /* Título de la fila: MAYÚSCULAS */
         .row-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 400; letter-spacing: 1px; color: var(--text-color); display: flex; align-items: center; text-transform: uppercase;}
         .row-title::before { content: ''; display: inline-block; width: 3px; height: 22px; background-color: var(--accent-color); margin-right: 15px; }
         
@@ -122,7 +116,7 @@
         .row:hover .scroll-btn, .hero-wrapper:hover .scroll-btn { opacity: 0.8; }
         .scroll-btn:hover { opacity: 1 !important; color: var(--accent-color);}
 
-        /* --- TARJETAS HORIZONTALES CON ZOOM SUTIL --- */
+        /* --- TARJETAS HORIZONTALES --- */
         .movie-card-wrapper { flex: 0 0 auto; width: 280px; text-decoration: none; cursor: pointer; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; z-index: 1; scroll-snap-align: start; }
         .movie-card-wrapper:hover { transform: translateY(-8px) scale(1.02); z-index: 100; transition-delay: 0s; }
         
@@ -132,7 +126,6 @@
         .thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .movie-card-wrapper:hover .thumbnail { transform: scale(1.08); } 
         
-        /* Título debajo de la miniatura: Centrado, Sans-Serif y más grande */
         .movie-info { 
             padding: 14px 4px 0 4px; 
             color: var(--text-color); 
@@ -247,6 +240,7 @@
 <body>
 
     <header id="main-header">
+        <a href="#" class="logo">Autor<span>.</span></a>
         
         <nav id="main-nav" class="main-nav">
             <div id="genres-menu" class="genres-menu"></div>
@@ -369,13 +363,20 @@
             return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
         }
 
+        // NUEVA FUNCIÓN: Extrae el año original del título de YouTube ANTES de limpiarlo
+        function extractYear(title) {
+            const match = title.match(/\b(19[2-9]\d|20[0-2]\d)\b/);
+            return match ? match[1] : "";
+        }
+
         function cleanTitle(title) {
             const excepciones = {
                 "el viaja al pasado y cambia el futuro (querida voy a comprar cigarros y vuelvo) 4k pelí argentina": "Querida, voy a comprar cigarrillos y vuelvo",
                 "la película argentina que predice el futuro / fase 7 [ película completa] con yayo": "Fase 7",
                 "david lynch's - hotel room (1993) [subtitulado al español]": "Hotel Room",
                 "alfred hitchcock | the man who knew too much (1934) crime, mystery, thriller | movie, subtitles": "The Man Who Knew Too Much",
-                '📽️"m - eine stadt sucht einen mörder".🎥fritz lang.1931/restored version/hd/deutsche-english-español🎦': "M - Eine Stadt sucht einen Mörder"
+                '📽️"m - eine stadt sucht einen mörder".🎥fritz lang.1931/restored version/hd/deutsche-english-español🎦': "M - Eine Stadt sucht einen Mörder",
+                'freudian psychoanalyst art garfunkel possesses theresa russell in nicolas roegs "bad timing" 1980': "Bad Timing"
             };
 
             const tituloNormalizado = title.toLowerCase().trim();
@@ -413,7 +414,7 @@
             }
 
             const basura = [ 
-                'pelicula completa', 'película completa', 'subtitulada', 'subtitulado', 'subtítulos', 'Subtitulos','subtitle', 
+                'pelicula completa', 'película completa', 'subtitulada', 'subtitulado', 'subtítulos', 'Subtitulos','subtitle', 'Subtitles',
                 'Brian De Palma', 'Documentary', 'criterion', 'Length', 'Watch', 'comedy', 'drama',
                 '8KR REMASTER', '480p', '720p', '1080p', '4k', 'hd', 'hq', 'eng', 'dub',
                 'cine', 'argentino', 'full', 'movie', 'español', 'espanol', 'latino', 'audio', 'Película', '|1974',
@@ -424,8 +425,8 @@
             basura.forEach(palabra => { t = t.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), ''); });
 
             const basuraExtra = ['Raúl Perrone', '. Leonardo Favio. Completo', 'Leonardo Favio', 'Gory Splatter Fest of a Film', '- Uk Ep 1-3', '35Mm Scan', "Peter Jackson's", '. This Is the - Japanese Paganistic Film From', 'Jorge Nisco', 'Dir. Kim Ki-young', 'Remaster', '. John Carpenter', "de - en", "Alemania Occidental",
-                                 ".de - en, ", "by Nikos Nikolaidis ", "Fernando Ayala", "Alejandro Agresti", "Néstor Montalbano", "Fhd", 
-                                 "John Cassavetes", "Daniel Barone", "Buster Keaton in ", "by Martin Scorsese", "Film with Subtitles", 
+                                 ".de - en, ", "Freudian Psychoanalyst Art Garfunkel Possesses Theresa Russell in Nicolas Roeg's ", "by Nikos Nikolaidis ", "Fernando Ayala", "Alejandro Agresti", "Néstor Montalbano", "Fhd", 
+                                 "John Cassavetes", "Dir. Werner Herzog", "Daniel Barone", "Buster Keaton in ", "by Martin Scorsese", "Film with Subtitles", 
                                  "Leonardo Di Cesare", 'Youtube 360P', 'Juan José Jusid',  'Adolfo Aristarain', '-luis Buñuel', 
                                  'Juan José Campanella', 'Freudian Psychoanalyst Art Garfunkel Possesses Theresa Russell in Nicolas Roegs', 
                                  'Abbas Kiarostami Completa', 'D. Pettinari', '—1973— Wojciech Has】multi-𝗦𝗨𝗕】', 
@@ -514,18 +515,30 @@
             }
         }
 
-        async function fetchHeroPlot(cleanUiTitle, ytDesc, elementId) {
+        // --- FETCH SINOPSIS DEL HERO (AHORA USA AÑO COMO FILTRO) ---
+        async function fetchHeroPlot(cleanUiTitle, ytDesc, elementId, movieYear) {
             const plotEl = document.getElementById(elementId);
             if (!plotEl) return;
             
             try {
-                let response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                let url = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`;
+                if (movieYear) url += `&y=${movieYear}`; // AGREGAMOS EL AÑO A LA BÚSQUEDA
+
+                let response = await fetch(url);
                 let data = await response.json();
                 
+                // Si falla CON el año, reintenta SIN el año
+                if (data.Response === "False" && movieYear) {
+                    response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                    data = await response.json();
+                }
+
                 if (data.Response === "False") {
                     const engTitle = await translateToEnglish(cleanUiTitle);
                     if (engTitle && engTitle.toLowerCase() !== cleanUiTitle.toLowerCase()) {
-                        response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(engTitle)}&apikey=${OMDB_API_KEY}`);
+                        let engUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(engTitle)}&apikey=${OMDB_API_KEY}`;
+                        if (movieYear) engUrl += `&y=${movieYear}`;
+                        response = await fetch(engUrl);
                         data = await response.json();
                     }
                 }
@@ -545,10 +558,13 @@
 
         async function loadAllHeroPlotsSequential(videosArray) {
             for (let i = 0; i < videosArray.length; i++) {
-                const uiTitle = cleanTitle(videosArray[i].snippet.title);
+                const originalTitle = videosArray[i].snippet.title;
+                const uiTitle = cleanTitle(originalTitle);
+                const movieYear = extractYear(originalTitle); // Extraemos el año
                 const desc = videosArray[i].snippet.description;
                 const plotId = `hero-plot-${videosArray[i].snippet.resourceId.videoId}-${i}`;
-                await fetchHeroPlot(uiTitle, desc, plotId);
+                
+                await fetchHeroPlot(uiTitle, desc, plotId, movieYear); // Pasamos el año
                 await new Promise(r => setTimeout(r, 600)); 
             }
         }
@@ -566,6 +582,7 @@
             videos.forEach((video, index) => {
                 const snippet = video.snippet;
                 const originalTitle = snippet.title;
+                const movieYear = extractYear(originalTitle); // Extraemos año para el botón
                 const uiTitle = cleanTitle(originalTitle); 
                 
                 const videoId = snippet.resourceId.videoId;
@@ -574,9 +591,8 @@
                 const slide = document.createElement('div');
                 slide.className = 'hero-slide';
 
-                let startAt = (index === 0) ? 600 : 600;
+                let startAt = (index === 0) ? 600 : 0;
 
-                // INSERCIÓN DE CAPAS: Portada (fade-out) y Video (auto-play en scroll)
                 slide.innerHTML = `
                     <div class="hero-cover" style="background-image: url('${imgUrl}')"></div>
                     <iframe class="hero-video-bg" 
@@ -600,7 +616,8 @@
 
                 const btn = document.createElement('button');
                 btn.className = 'info-btn';
-                btn.onclick = () => openMovieModal(videoId, uiTitle, imgUrl, video._duration, snippet.description, startAt);
+                // Enviamos también el movieYear al modal
+                btn.onclick = () => openMovieModal(videoId, uiTitle, imgUrl, video._duration, snippet.description, startAt, movieYear);
                 btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Más Info`;
 
                 content.appendChild(titleEl);
@@ -613,7 +630,6 @@
             carousel.appendChild(fragment);
             wrapper.style.display = 'block';
 
-            // INTERSECTION OBSERVER PARA REPRODUCIR Y HACER FADE OUT DE LA IMAGEN
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const iframe = entry.target.querySelector('.hero-video-bg');
@@ -622,17 +638,14 @@
                     if (iframe) {
                         if (entry.isIntersecting) {
                             if (!iframe.getAttribute('src')) {
-                                // 1. Cuando carga el iframe, esperamos 1.5 segs para ocultar la foto y mostrar el video
                                 iframe.onload = () => {
                                     slide.dataset.fadeTimer = setTimeout(() => {
                                         slide.classList.add('video-playing');
                                     }, 1500);
                                 };
-                                // 2. Iniciamos la carga del video
                                 iframe.setAttribute('src', iframe.getAttribute('data-src'));
                             }
                         } else {
-                            // Cuando sale de pantalla, frenamos el video y restauramos la foto
                             iframe.removeAttribute('src'); 
                             iframe.onload = null;
                             clearTimeout(slide.dataset.fadeTimer);
@@ -753,7 +766,8 @@
             return cleaned;
         }
 
-       async function openMovieModal(videoId, cleanUiTitle, ytPosterUrl, duration, ytDescription, startTime = 0) {
+        // --- OPEN MOVIE MODAL (AHORA USA AÑO COMO FILTRO TAMBIÉN) ---
+       async function openMovieModal(videoId, cleanUiTitle, ytPosterUrl, duration, ytDescription, startTime = 0, movieYear = "") {
             const modal = document.getElementById('movie-modal');
             const loader = document.getElementById('modal-loader');
             
@@ -782,11 +796,23 @@
             const cleanYtDesc = cleanYouTubeDescription(ytDescription);
 
             try {
-                let response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                let url = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`;
+                if (movieYear) url += `&y=${movieYear}`;
+
+                let response = await fetch(url);
                 let data = await response.json();
 
+                // Reintento sin año
+                if (data.Response === "False" && movieYear) {
+                    response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                    data = await response.json();
+                }
+
+                // Reintento por lista de busqueda general
                 if (data.Response === "False") {
-                    const searchResp = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
+                    let sUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`;
+                    if (movieYear) sUrl += `&y=${movieYear}`;
+                    const searchResp = await fetch(sUrl);
                     const searchData = await searchResp.json();
                     if (searchData.Response === "True" && searchData.Search.length > 0) {
                         const imdbId = searchData.Search[0].imdbID;
@@ -795,14 +821,19 @@
                     }
                 }
 
+                // Reintento traduciendo al inglés
                 if (data.Response === "False") {
                     const englishTitle = await translateToEnglish(cleanUiTitle);
                     if (englishTitle.toLowerCase() !== cleanUiTitle.toLowerCase()) {
-                        response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(englishTitle)}&apikey=${OMDB_API_KEY}`);
+                        let engUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(englishTitle)}&apikey=${OMDB_API_KEY}`;
+                        if (movieYear) engUrl += `&y=${movieYear}`;
+                        response = await fetch(engUrl);
                         data = await response.json();
                         
                         if (data.Response === "False") {
-                            const searchRespEn = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(englishTitle)}&apikey=${OMDB_API_KEY}`);
+                            let sEngUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(englishTitle)}&apikey=${OMDB_API_KEY}`;
+                            if (movieYear) sEngUrl += `&y=${movieYear}`;
+                            const searchRespEn = await fetch(sEngUrl);
                             const searchDataEn = await searchRespEn.json();
                             if (searchDataEn.Response === "True" && searchDataEn.Search.length > 0) {
                                 const imdbIdEn = searchDataEn.Search[0].imdbID;
@@ -895,6 +926,7 @@
             const snippet = videoItem.snippet;
             const videoId = snippet.resourceId.videoId;
             const originalTitle = snippet.title;
+            const movieYear = extractYear(originalTitle); // Extraemos año para las tarjetas
             const uiTitle = cleanTitle(originalTitle); 
             
             const thumbnails = snippet.thumbnails;
@@ -903,7 +935,8 @@
             const cardWrapper = document.createElement('div'); 
             cardWrapper.className = 'movie-card-wrapper'; 
             
-            cardWrapper.onclick = () => openMovieModal(videoId, uiTitle, ytImgUrl, videoItem._duration, snippet.description, 0);
+            // Le pasamos el movieYear a la función del modal
+            cardWrapper.onclick = () => openMovieModal(videoId, uiTitle, ytImgUrl, videoItem._duration, snippet.description, 0, movieYear);
 
             const posterContainer = document.createElement('div');
             posterContainer.className = 'poster-container';
