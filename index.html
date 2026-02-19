@@ -17,7 +17,7 @@
             --bg-color: #0a0b0e; 
             --bg-surface: #14161a; 
             --text-color: #ecebe6; 
-            --text-muted: #dce1eb; /* NUEVO COLOR MUTED MÁS CLARO Y ELEGANTE */
+            --text-muted: #dce1eb; /* Muted más claro y elegante */
             --accent-color: #d4af37; /* Oro Cinematográfico */
             
             --font-ui: 'Outfit', sans-serif;
@@ -37,7 +37,7 @@
         /* --- BARRA DE BÚSQUEDA --- */
         .search-container { margin-left: auto; display: flex; align-items: center; }
         .search-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-color); padding: 8px 15px; border-radius: 20px; outline: none; font-size: 0.9rem; font-family: var(--font-ui); transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); width: 130px; }
-        .search-input:focus { background: rgba(0, 0, 0, 0.8); border-color: var(--accent-color); width: 180px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);}
+        .search-input:focus { background: rgba(0, 0, 0, 0.8); border-color: var(--accent-color); width: 150px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);}
         .search-input::placeholder { color: rgba(236, 235, 230, 0.4); font-weight: 300;}
 
         /* --- DROPDOWNS (POR CLICK) --- */
@@ -60,14 +60,14 @@
         .genre-chip:hover { background: #fff; color: #000; border-color: #fff; transform: scale(1.05); }
 
         /* --- SECCIÓN HERO FULL BLEED --- */
-        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; transition: opacity 0.3s ease; }
+        .hero-wrapper { position: relative; width: 100%; height: 85vh; min-height: 500px; overflow: hidden; background-color: #000; transition: opacity 0.3s ease; border-bottom: 1px solid rgba(255,255,255,0.05);}
         
-        /* NUEVO: FADE INFERIOR PROFUNDO PARA FUNDIRSE CON EL FONDO */
+        /* FADE INFERIOR PROFUNDO PARA FUNDIRSE CON EL FONDO */
         .hero-wrapper::after {
             content: '';
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 25vh; /* Altura del fundido */
+            height: 25vh; 
             background: linear-gradient(to top, var(--bg-color) 0%, transparent 100%);
             z-index: 5;
             pointer-events: none;
@@ -76,13 +76,19 @@
         .hero-carousel { display: flex; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; }
         .hero-carousel::-webkit-scrollbar { display: none; }
         
-        .hero-slide { flex: 0 0 100%; height: 100%; position: relative; background-size: cover; background-position: center top; scroll-snap-align: start; display: flex; align-items: flex-end; padding-bottom: 8%; overflow: hidden;}
-        /* Sombra izquierda y sombra extra de fondo */
-        .hero-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(10,11,14,0.95) 0%, rgba(10,11,14,0.4) 50%, transparent 100%), linear-gradient(to top, rgba(10,11,14,0.8) 0%, rgba(10,11,14,0.3) 40%, transparent 100%); z-index: 1; }
+        .hero-slide { flex: 0 0 100%; height: 100%; position: relative; scroll-snap-align: start; display: flex; align-items: flex-end; padding-bottom: 8%; overflow: hidden;}
         
+        /* Capa 0: El reproductor de video de fondo */
         .hero-video-bg { position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); z-index: 0; pointer-events: none; border: none; opacity: 0.8;}
 
-        /* Aumento del z-index para que el texto esté sobre el nuevo Fade */
+        /* Capa 1: La imagen de portada (fade out cuando el video corre) */
+        .hero-cover { position: absolute; inset: 0; background-size: cover; background-position: center top; z-index: 1; transition: opacity 1.5s ease-in-out; pointer-events: none; }
+        .hero-slide.video-playing .hero-cover { opacity: 0; }
+
+        /* Capa 2: Degradado lateral para que los textos se lean bien */
+        .hero-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(10,11,14,0.95) 0%, rgba(10,11,14,0.4) 50%, transparent 100%), linear-gradient(to top, rgba(10,11,14,0.8) 0%, rgba(10,11,14,0.3) 40%, transparent 100%); z-index: 2; pointer-events: none; }
+        
+        /* Capa 10: Contenido (Textos y Botones) */
         .hero-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%; max-width: 800px; padding: 0 4%; }
         
         .hero-title { font-family: var(--font-display); font-size: 4rem; font-weight: 700; margin: 0 0 15px 0; line-height: 1.05; letter-spacing: 1px; text-shadow: 0 10px 30px rgba(0,0,0,0.9); color: var(--text-color); text-transform: uppercase; }
@@ -104,6 +110,7 @@
         .main-content { padding-bottom: 50px; min-height: 50vh; position: relative; z-index: 10; margin-top: 30px; transition: padding-top 0.3s ease; }
         .row { margin-bottom: 50px; position: relative; }
         
+        /* Título de la fila: MAYÚSCULAS */
         .row-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 15px; padding: 0 4%; font-weight: 400; letter-spacing: 1px; color: var(--text-color); display: flex; align-items: center; text-transform: uppercase;}
         .row-title::before { content: ''; display: inline-block; width: 3px; height: 22px; background-color: var(--accent-color); margin-right: 15px; }
         
@@ -125,6 +132,7 @@
         .thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .movie-card-wrapper:hover .thumbnail { transform: scale(1.08); } 
         
+        /* Título debajo de la miniatura: Centrado, Sans-Serif y más grande */
         .movie-info { 
             padding: 14px 4px 0 4px; 
             color: var(--text-color); 
@@ -183,7 +191,7 @@
         .modal-close { position: absolute; top: 25px; right: 30px; background: transparent; border: none; color: var(--text-muted); font-size: 1.8rem; font-weight: 300; cursor: pointer; transition: color 0.3s; z-index: 10; font-family: var(--font-ui);}
         .modal-close:hover { color: var(--text-color); transform: scale(1.1); }
 
-        .modal-poster { width: 32%; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); object-fit: cover; aspect-ratio: 2/3; }
+        .modal-poster { width: 32%; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); object-fit: cover; aspect-ratio: 2/3; }
         
         .modal-info-text { width: 68%; display: flex; flex-direction: column; }
         .modal-title { font-family: var(--font-display); font-size: 2.8rem; margin: 0 0 10px 0; line-height: 1.1; color: var(--text-color);}
@@ -239,7 +247,6 @@
 <body>
 
     <header id="main-header">
-
         
         <nav id="main-nav" class="main-nav">
             <div id="genres-menu" class="genres-menu"></div>
@@ -507,7 +514,6 @@
             }
         }
 
-        // --- FUNCIÓN SECUENCIAL PARA LAS SINOPSIS DEL HERO ---
         async function fetchHeroPlot(cleanUiTitle, ytDesc, elementId) {
             const plotEl = document.getElementById(elementId);
             if (!plotEl) return;
@@ -543,13 +549,11 @@
                 const desc = videosArray[i].snippet.description;
                 const plotId = `hero-plot-${videosArray[i].snippet.resourceId.videoId}-${i}`;
                 await fetchHeroPlot(uiTitle, desc, plotId);
-                // Pausa sutil entre cada llamado para que Google Translate no nos bloquee
                 await new Promise(r => setTimeout(r, 600)); 
             }
         }
 
         async function loadHeroCarousel() {
-            // Limitamos a 6 videos para no saturar OMDb al inicio
             const videosRaw = await fetchPlaylistVideos(HERO_PLAYLIST_ID);
             const videos = videosRaw.slice(0, 6); 
             
@@ -569,14 +573,14 @@
 
                 const slide = document.createElement('div');
                 slide.className = 'hero-slide';
-                slide.style.backgroundImage = `url('${imgUrl}')`;
 
                 let startAt = (index === 0) ? 600 : 0;
 
-                // Preparamos el iframe (usamos data-src para cargarlo cuando esté visible)
+                // INSERCIÓN DE CAPAS: Portada (fade-out) y Video (auto-play en scroll)
                 slide.innerHTML = `
+                    <div class="hero-cover" style="background-image: url('${imgUrl}')"></div>
                     <iframe class="hero-video-bg" 
-                        data-src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&loop=1&playlist=${videoId}&start=${startAt}" 
+                        data-src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&loop=1&playlist=${videoId}&start=${startAt}&playsinline=1" 
                         frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
                     </iframe>
                 `;
@@ -588,7 +592,6 @@
                 titleEl.className = 'hero-title';
                 titleEl.innerText = uiTitle; 
 
-                // Elemento de la sinopsis
                 const plotId = `hero-plot-${videoId}-${index}`;
                 const plotEl = document.createElement('p');
                 plotEl.className = 'hero-plot';
@@ -610,22 +613,37 @@
             carousel.appendChild(fragment);
             wrapper.style.display = 'block';
 
-            // INTERSECTION OBSERVER: Reproduce los videos SOLO cuando los estás mirando
+            // INTERSECTION OBSERVER PARA REPRODUCIR Y HACER FADE OUT DE LA IMAGEN
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const iframe = entry.target.querySelector('.hero-video-bg');
-                    if (entry.isIntersecting) {
-                        if (!iframe.src) iframe.src = iframe.dataset.src;
-                    } else {
-                        // Al salir de la vista, lo apagamos para no saturar la PC
-                        iframe.src = ''; 
+                    const slide = entry.target;
+
+                    if (iframe) {
+                        if (entry.isIntersecting) {
+                            if (!iframe.getAttribute('src')) {
+                                // 1. Cuando carga el iframe, esperamos 1.5 segs para ocultar la foto y mostrar el video
+                                iframe.onload = () => {
+                                    slide.dataset.fadeTimer = setTimeout(() => {
+                                        slide.classList.add('video-playing');
+                                    }, 1500);
+                                };
+                                // 2. Iniciamos la carga del video
+                                iframe.setAttribute('src', iframe.getAttribute('data-src'));
+                            }
+                        } else {
+                            // Cuando sale de pantalla, frenamos el video y restauramos la foto
+                            iframe.removeAttribute('src'); 
+                            iframe.onload = null;
+                            clearTimeout(slide.dataset.fadeTimer);
+                            slide.classList.remove('video-playing');
+                        }
                     }
                 });
             }, { root: carousel, threshold: 0.5 });
 
             document.querySelectorAll('.hero-slide').forEach(slide => observer.observe(slide));
 
-            // Cargamos las reseñas una por una
             loadAllHeroPlotsSequential(videos);
         }
 
