@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmo de Autor</title>
     <link rel="icon" type="image/png" href="icons8-youtube-32.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,8 +36,8 @@
 
         /* --- BARRA DE BÚSQUEDA --- */
         .search-container { margin-left: auto; display: flex; align-items: center; }
-        .search-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-color); padding: 8px 15px; border-radius: 20px; outline: none; font-size: 0.9rem; font-family: var(--font-ui); transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); width: 130px; }
-        .search-input:focus { background: rgba(0, 0, 0, 0.8); border-color: var(--accent-color); width: 180px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);}
+        .search-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-color); padding: 8px 15px; border-radius: 20px; outline: none; font-size: 0.9rem; font-family: var(--font-ui); transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); width: 110px; }
+        .search-input:focus { background: rgba(0, 0, 0, 0.8); border-color: var(--accent-color); width: 125px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);}
         .search-input::placeholder { color: rgba(236, 235, 230, 0.4); font-weight: 300;}
 
         /* --- DROPDOWNS (POR CLICK) --- */
@@ -239,7 +240,6 @@
 <body>
 
     <header id="main-header">
-        <a href="#" class="logo">Autor<span>.</span></a>
         
         <nav id="main-nav" class="main-nav">
             <div id="genres-menu" class="genres-menu"></div>
