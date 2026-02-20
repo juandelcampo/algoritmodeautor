@@ -941,20 +941,19 @@
             let mensaje = "Ocurrió un error al intentar reproducir el video.";
             
             if (event.data == 101 || event.data == 150) {
-                mensaje = "El autor no permite reproducir esta obra fuera de YouTube, o el contenido tiene restricción de edad.";
+                mensaje = "Esta vas a tener que verla en Youtube.";
             } else if (event.data == 100) {
                 mensaje = "Esta película ya no está disponible o fue eliminada por el autor.";
             }
 
             // Inyectamos el texto de aviso y un botón directo a YouTube
-            errorContainer.innerHTML = `
-                <p style="color: var(--text-color); font-size: 1.2rem; margin-bottom: 30px; font-weight: 300; font-family: var(--font-ui); max-width: 80%; line-height: 1.5;">${mensaje}</p>
-                <a href="https://www.youtube.com/watch?v=${currentVideoId}" target="_blank" class="modal-play-btn" style="text-decoration: none;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
-                    Ver en YouTube
-                </a>
-            `;
-        }
+                        errorContainer.innerHTML = `
+                            <p style="color: var(--text-color); font-size: 1.2rem; margin-bottom: 30px; font-weight: 300; font-family: var(--font-ui); max-width: 80%; line-height: 1.5;">${mensaje}</p>
+                            <a href="https://www.youtube.com/watch?v=${currentVideoId}" target="_blank" class="modal-play-btn" style="text-decoration: none; align-self: center; margin-top: 0;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
+                                Ver en YouTube
+                            </a>
+                        `;
 
         function closeModal() {
             document.getElementById('movie-modal').classList.remove('active');
