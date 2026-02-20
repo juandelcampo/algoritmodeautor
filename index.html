@@ -123,8 +123,19 @@
         .poster-container { width: 100%; aspect-ratio: 16/9; position: relative; border-radius: 6px; overflow: hidden; background-color: var(--bg-surface); box-shadow: 0 6px 15px rgba(0,0,0,0.4); transition: box-shadow 0.4s ease; border: 1px solid rgba(255,255,255,0.02);}
         .movie-card-wrapper:hover .poster-container { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8); border-color: rgba(212, 175, 55, 0.3);}
         
-        .thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        .movie-card-wrapper:hover .thumbnail { transform: scale(1.08); } 
+        .thumbnail { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            /* Zoom inicial para "comerse" los bordes negros nativos de YouTube */
+            transform: scale(1.10); 
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        }
+
+        .movie-card-wrapper:hover .thumbnail { 
+            /* Aumentamos un poco más el zoom para no perder tu efecto al pasar el mouse */
+            transform: scale(1.25); 
+        }
         
         .movie-info { 
             padding: 14px 4px 0 4px; 
@@ -306,6 +317,8 @@
         </div>
     </div>
 
+   <script src="https://www.youtube.com/iframe_api"></script>
+
    <script>
         const API_KEY = 'AIzaSyDuK3KF3GCPU_IHzHUOVpWHNqqBN-7lVPM'; 
         const OMDB_API_KEY = 'dd75c1c5'; 
@@ -314,6 +327,7 @@
 
         let currentVideoId = "";
         let currentStartTime = 0;
+        let ytPlayer; // Variable global para el reproductor de YouTube
 
         const categories = [
             { playlistId: "PLV7ZM4nm6CtKLpBKx3ZWIAdGHnNF6w8SS", title: "Destacadas", type: "genre" },
@@ -362,7 +376,6 @@
             return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
         }
 
-        // NUEVA FUNCIÓN: Extrae el año original del título de YouTube ANTES de limpiarlo
         function extractYear(title) {
             const match = title.match(/\b(19[2-9]\d|20[0-2]\d)\b/);
             return match ? match[1] : "";
@@ -376,7 +389,8 @@
                 "alfred hitchcock | the man who knew too much (1934) crime, mystery, thriller | movie, subtitles": "The Man Who Knew Too Much",
                 '📽️"m - eine stadt sucht einen mörder".🎥fritz lang.1931/restored version/hd/deutsche-english-español🎦': "M - Eine Stadt sucht einen Mörder",
                 'freudian psychoanalyst art garfunkel possesses theresa russell in nicolas roegs "bad timing" 1980': "Bad Timing",
-                '1989 • 2023 - the museum visitor (alternative edition)': "A Visitor to a Museum"
+                '1989 • 2023 - the museum visitor (alternative edition)': "A Visitor to a Museum",
+                'cabeza borradora de david lynch (hd). subtítulos en español': "Eraserhead"
             };
 
             const tituloNormalizado = title.toLowerCase().trim();
@@ -515,19 +529,17 @@
             }
         }
 
-        // --- FETCH SINOPSIS DEL HERO (AHORA USA AÑO COMO FILTRO) ---
         async function fetchHeroPlot(cleanUiTitle, ytDesc, elementId, movieYear) {
             const plotEl = document.getElementById(elementId);
             if (!plotEl) return;
             
             try {
                 let url = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`;
-                if (movieYear) url += `&y=${movieYear}`; // AGREGAMOS EL AÑO A LA BÚSQUEDA
+                if (movieYear) url += `&y=${movieYear}`;
 
                 let response = await fetch(url);
                 let data = await response.json();
                 
-                // Si falla CON el año, reintenta SIN el año
                 if (data.Response === "False" && movieYear) {
                     response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
                     data = await response.json();
@@ -560,11 +572,11 @@
             for (let i = 0; i < videosArray.length; i++) {
                 const originalTitle = videosArray[i].snippet.title;
                 const uiTitle = cleanTitle(originalTitle);
-                const movieYear = extractYear(originalTitle); // Extraemos el año
+                const movieYear = extractYear(originalTitle);
                 const desc = videosArray[i].snippet.description;
                 const plotId = `hero-plot-${videosArray[i].snippet.resourceId.videoId}-${i}`;
                 
-                await fetchHeroPlot(uiTitle, desc, plotId, movieYear); // Pasamos el año
+                await fetchHeroPlot(uiTitle, desc, plotId, movieYear);
                 await new Promise(r => setTimeout(r, 600)); 
             }
         }
@@ -582,7 +594,7 @@
             videos.forEach((video, index) => {
                 const snippet = video.snippet;
                 const originalTitle = snippet.title;
-                const movieYear = extractYear(originalTitle); // Extraemos año para el botón
+                const movieYear = extractYear(originalTitle);
                 const uiTitle = cleanTitle(originalTitle); 
                 
                 const videoId = snippet.resourceId.videoId;
@@ -616,7 +628,6 @@
 
                 const btn = document.createElement('button');
                 btn.className = 'info-btn';
-                // Enviamos también el movieYear al modal
                 btn.onclick = () => openMovieModal(videoId, uiTitle, imgUrl, video._duration, snippet.description, startAt, movieYear);
                 btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Más Info`;
 
@@ -766,7 +777,6 @@
             return cleaned;
         }
 
-        // --- OPEN MOVIE MODAL (AHORA USA AÑO COMO FILTRO TAMBIÉN) ---
        async function openMovieModal(videoId, cleanUiTitle, ytPosterUrl, duration, ytDescription, startTime = 0, movieYear = "") {
             const modal = document.getElementById('movie-modal');
             const loader = document.getElementById('modal-loader');
@@ -802,13 +812,11 @@
                 let response = await fetch(url);
                 let data = await response.json();
 
-                // Reintento sin año
                 if (data.Response === "False" && movieYear) {
                     response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`);
                     data = await response.json();
                 }
 
-                // Reintento por lista de busqueda general
                 if (data.Response === "False") {
                     let sUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(cleanUiTitle)}&apikey=${OMDB_API_KEY}`;
                     if (movieYear) sUrl += `&y=${movieYear}`;
@@ -821,7 +829,6 @@
                     }
                 }
 
-                // Reintento traduciendo al inglés
                 if (data.Response === "False") {
                     const englishTitle = await translateToEnglish(cleanUiTitle);
                     if (englishTitle.toLowerCase() !== cleanUiTitle.toLowerCase()) {
@@ -890,30 +897,69 @@
             loader.style.display = 'none';
         }
 
+        /* --- NUEVO SISTEMA DE REPRODUCCIÓN (API DE YOUTUBE) --- */
         function playVideo() {
             document.getElementById('modal-details').style.display = 'none';
             const videoContainer = document.getElementById('video-container');
             videoContainer.style.display = 'block';
             
-            let startParam = currentStartTime > 0 ? `&start=${currentStartTime}` : '';
-
+            // Estructura con div para YouTube y div oculto para errores
             videoContainer.innerHTML = `
-                <iframe 
-                    width="100%" 
-                    height="100%" 
-                    src="https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1&rel=0${startParam}&origin=https://www.youtube.com" 
-                    title="YouTube video player" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
+                <div id="yt-player-div" style="width: 100%; height: 100%;"></div>
+                <div id="yt-error-container" style="display:none; height: 100%; flex-direction: column; justify-content: center; align-items: center; background: #000; padding: 20px; text-align: center;"></div>
+            `;
+            
+            let startParam = currentStartTime > 0 ? currentStartTime : 0;
+
+            // Instanciamos el reproductor
+            ytPlayer = new YT.Player('yt-player-div', {
+                height: '100%',
+                width: '100%',
+                videoId: currentVideoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'rel': 0,
+                    'start': startParam,
+                    'origin': window.location.origin 
+                },
+                events: {
+                    'onError': onPlayerError // Escucha fallos
+                }
+            });
+        }
+
+        // Función que atrapa el error
+        function onPlayerError(event) {
+            const errorContainer = document.getElementById('yt-error-container');
+            
+            // YouTube reemplaza nuestro div original por un iframe, así que lo buscamos para ocultarlo
+            const ytIframe = document.getElementById('yt-player-div');
+            if (ytIframe) ytIframe.style.display = 'none';
+            
+            errorContainer.style.display = 'flex';
+
+            let mensaje = "Ocurrió un error al intentar reproducir el video.";
+            
+            if (event.data == 101 || event.data == 150) {
+                mensaje = "El autor no permite reproducir esta obra fuera de YouTube, o el contenido tiene restricción de edad.";
+            } else if (event.data == 100) {
+                mensaje = "Esta película ya no está disponible o fue eliminada por el autor.";
+            }
+
+            // Inyectamos el texto de aviso y un botón directo a YouTube
+            errorContainer.innerHTML = `
+                <p style="color: var(--text-color); font-size: 1.2rem; margin-bottom: 30px; font-weight: 300; font-family: var(--font-ui); max-width: 80%; line-height: 1.5;">${mensaje}</p>
+                <a href="https://www.youtube.com/watch?v=${currentVideoId}" target="_blank" class="modal-play-btn" style="text-decoration: none;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
+                    Ver en YouTube
+                </a>
             `;
         }
 
         function closeModal() {
             document.getElementById('movie-modal').classList.remove('active');
             document.body.style.overflow = 'auto'; 
-            document.getElementById('video-container').innerHTML = '';
+            document.getElementById('video-container').innerHTML = ''; // Esto destruye el ytPlayer al cerrar el modal
             document.getElementById('video-container').style.display = 'none';
             document.getElementById('modal-details').style.display = 'flex';
         }
@@ -926,7 +972,7 @@
             const snippet = videoItem.snippet;
             const videoId = snippet.resourceId.videoId;
             const originalTitle = snippet.title;
-            const movieYear = extractYear(originalTitle); // Extraemos año para las tarjetas
+            const movieYear = extractYear(originalTitle); 
             const uiTitle = cleanTitle(originalTitle); 
             
             const thumbnails = snippet.thumbnails;
@@ -935,7 +981,6 @@
             const cardWrapper = document.createElement('div'); 
             cardWrapper.className = 'movie-card-wrapper'; 
             
-            // Le pasamos el movieYear a la función del modal
             cardWrapper.onclick = () => openMovieModal(videoId, uiTitle, ytImgUrl, videoItem._duration, snippet.description, 0, movieYear);
 
             const posterContainer = document.createElement('div');
