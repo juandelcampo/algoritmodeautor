@@ -381,6 +381,11 @@
             return match ? match[1] : "";
         }
 
+        function shouldFilterVideo(title) {
+            const normalizedTitle = title.toLowerCase().trim();
+            return normalizedTitle === 'deleted video' || normalizedTitle === 'private video';
+        }
+
         function cleanTitle(title) {
             const excepciones = {
                 "el viaja al pasado y cambia el futuro (querida voy a comprar cigarros y vuelvo) 4k pelí argentina": "Querida, voy a comprar cigarrillos y vuelvo",
@@ -583,7 +588,10 @@
 
         async function loadHeroCarousel() {
             const videosRaw = await fetchPlaylistVideos(HERO_PLAYLIST_ID);
-            const videos = videosRaw.slice(0, 6); 
+            
+            // Filtrar videos de YouTube que están borrados o privados
+            const videoFiltered = videosRaw.filter(video => !shouldFilterVideo(video.snippet.title));
+            const videos = videoFiltered.slice(0, 6); 
             
             const carousel = document.getElementById('hero-carousel');
             const wrapper = document.getElementById('hero-wrapper');
@@ -714,10 +722,15 @@
             const videos = await fetchPlaylistVideos(playlistId);
 
             if (videos.length === 0) { rowDiv.style.display = 'none'; return null; }
-            if (videos.length < 5) { leftBtn.style.display = 'none'; rightBtn.style.display = 'none'; }
+            
+            // Filtrar videos de YouTube que están borrados o privados
+            const filteredVideos = videos.filter(video => !shouldFilterVideo(video.snippet.title));
+            
+            if (filteredVideos.length === 0) { rowDiv.style.display = 'none'; return null; }
+            if (filteredVideos.length < 5) { leftBtn.style.display = 'none'; rightBtn.style.display = 'none'; }
 
             const fragment = document.createDocumentFragment();
-            videos.forEach(video => fragment.appendChild(createMovieCard(video)));
+            filteredVideos.forEach(video => fragment.appendChild(createMovieCard(video)));
             postersDiv.appendChild(fragment);
         }
 
